@@ -41,6 +41,7 @@ h1{font-size:20px;text-align:center;padding:8px 0 2px}
 .sub2 .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .sub2 .who{font-size:15px;font-weight:700}
 .sub2 .time{font-size:12px;color:var(--sub)}
+.sub2 .time2{font-size:12.5px;color:var(--acc2);margin-top:4px}
 .sub2 .items{margin-top:10px}
 .srow{display:flex;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
 .srow img{width:52px;height:66px;object-fit:cover;border-radius:8px;background:#000}
@@ -165,7 +166,7 @@ async function renderDetail(p){
   }
   subs.forEach((s,idx)=>{
     const div=document.createElement('div'); div.className='sub2';
-    const time=new Date(s.created_at).toLocaleString('zh-CN',{hour12:false});
+    const time=fmtTime(new Date(s.created_at));
     const ch=(s.data&&s.data.choices)||[];
     let rows='';
     ch.forEach(c=>{
@@ -179,14 +180,42 @@ async function renderDetail(p){
           (!c.agree&&c.reason?'<span class="rsn">理由：'+esc(c.reason)+'</span>':'')+'</div></div>';
       }
     });
-    div.innerHTML='<div class="hd"><span class="who">'+esc(s.selector)+'</span><span class="time">'+time+(idx===0?' · 最新':'')+'</span></div>'+
+    div.innerHTML='<div class="hd"><span class="who">'+esc(s.selector)+'</span>'+(idx===0?'<span class="chip ok" style="font-size:11px">最新</span>':'')+'</div>'+
+      '<div class="time2">提交时间：'+time+'</div>'+
       '<div class="items">'+rows+'</div>'+
-      '<div class="acts"><button class="primary pdf">下载此结果 PDF</button></div>';
+      '<div class="acts"><button class="primary pdf">下载此结果 PDF</button><button class="del">删除此记录</button></div>';
     div.querySelector('.pdf').onclick=()=>exportPDF(p,s);
+    div.querySelector('.del').onclick=()=>delSub(p,s,div);
     d.appendChild(div);
   });
   window.scrollTo(0,0);
   $('detail').scrollIntoView();
+}
+
+/* 时间：精确到秒 + 相对提示 */
+function fmtTime(t){
+  const pad=n=>String(n).padStart(2,'0');
+  const abs=t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate())+' '+pad(t.getHours())+':'+pad(t.getMinutes())+':'+pad(t.getSeconds());
+  const days=Math.floor((Date.now()-t.getTime())/86400000);
+  const rel=days<=0?'今天':days===1?'昨天':days+' 天前';
+  return abs+'（'+rel+'）';
+}
+/* 删除单条提交 */
+async function delSub(p,s,div){
+  if(!confirm('确定删除这条提交记录？\n'+s.selector+' · '+fmtTime(new Date(s.created_at))+'\n删除后不可恢复。'))return;
+  try{
+    const r=await fetch(CONFIG.SUPABASE_URL+'/rest/v1/submissions?id=eq.'+s.id,{
+      method:'DELETE',
+      headers:{'apikey':CONFIG.SUPABASE_KEY,'Authorization':'Bearer '+CONFIG.SUPABASE_KEY}
+    });
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const arr=window['_subs_'+p.id]||[];
+    window['_subs_'+p.id]=arr.filter(x=>x.id!==s.id);
+    div.remove();
+    toast('已删除');
+    renderProjects();
+    renderDetail(p);
+  }catch(e){toast('删除失败：'+e.message);}
 }
 
 /* ===== PDF 生成（和选择页同款范式） ===== */
