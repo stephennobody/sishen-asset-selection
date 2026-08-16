@@ -1,0 +1,27 @@
+{
+ "title_zh": "死神之吻 · 人物资产选择",
+ "title_vi": "Nụ Hôn Tử Thần · Lựa chọn nhân vật",
+ "subtitle_zh": "为每个角色选 1 个方案 → 点「确认提交」即可，无需下载任何文件",
+ "subtitle_vi": "Chọn 1 phương án cho mỗi nhân vật → bấm 「Xác nhận gửi」là xong, không cần tải file",
+ "choosers": [
+  {
+   "zh": "Dennis 先生",
+   "vi": "Ngài Dennis"
+  },
+  {
+   "zh": "Bao 先生",
+   "vi": "Ngài Bao"
+  },
+  {
+   "zh": "Long 先生",
+   "vi": "Ngài Long"
+  },
+  {
+   "zh": "Duku 导演",
+   "vi": "Đạo diễn Duku"
+  }
+ ],
+ "export_prefix": "死神之吻_人物选择",
+ "storageKey": "sishen_sel_v2",
+ "project_id": "sishen"
+}

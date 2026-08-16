@@ -1,0 +1,190 @@
+{
+ "categories": [
+  {
+   "id": "char",
+   "zh": "人物",
+   "vi": "Nhân vật"
+  }
+ ],
+ "groups": [
+  {
+   "id": "an",
+   "zh": "安",
+   "category": "char",
+   "vi": "An"
+  },
+  {
+   "id": "du",
+   "zh": "杜",
+   "category": "char",
+   "vi": "Đỗ"
+  },
+  {
+   "id": "ming",
+   "zh": "明",
+   "category": "char",
+   "vi": "Minh"
+  },
+  {
+   "id": "mingwang",
+   "zh": "冥王 · 冥界统治者",
+   "category": "char",
+   "vi": "Minh Vương · Chúa tể Minh giới"
+  }
+ ],
+ "items": [
+  {
+   "n": 1,
+   "name": "安-1",
+   "file": "img-01.jpg",
+   "w": 1200,
+   "h": 1600,
+   "group": "an",
+   "category": "char"
+  },
+  {
+   "n": 2,
+   "name": "安-2",
+   "file": "img-02.jpg",
+   "w": 1600,
+   "h": 903,
+   "group": "an",
+   "category": "char"
+  },
+  {
+   "n": 3,
+   "name": "安-3",
+   "file": "img-03.jpg",
+   "w": 1065,
+   "h": 1600,
+   "group": "an",
+   "category": "char"
+  },
+  {
+   "n": 4,
+   "name": "安-4",
+   "file": "img-04.jpg",
+   "w": 1600,
+   "h": 903,
+   "group": "an",
+   "category": "char"
+  },
+  {
+   "n": 5,
+   "name": "安-5",
+   "file": "img-05.jpg",
+   "w": 900,
+   "h": 1600,
+   "group": "an",
+   "category": "char"
+  },
+  {
+   "n": 6,
+   "name": "安-6",
+   "file": "img-06.jpg",
+   "w": 1600,
+   "h": 903,
+   "group": "an",
+   "category": "char"
+  },
+  {
+   "n": 7,
+   "name": "杜-1",
+   "file": "img-07.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "du",
+   "category": "char"
+  },
+  {
+   "n": 8,
+   "name": "杜-2",
+   "file": "img-08.jpg",
+   "w": 1600,
+   "h": 903,
+   "group": "du",
+   "category": "char"
+  },
+  {
+   "n": 9,
+   "name": "杜-3",
+   "file": "img-09.jpg",
+   "w": 1600,
+   "h": 907,
+   "group": "du",
+   "category": "char"
+  },
+  {
+   "n": 10,
+   "name": "杜-4",
+   "file": "img-10.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "du",
+   "category": "char"
+  },
+  {
+   "n": 11,
+   "name": "杜-5",
+   "file": "img-11.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "du",
+   "category": "char"
+  },
+  {
+   "n": 12,
+   "name": "明-1",
+   "file": "img-12.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "ming",
+   "category": "char"
+  },
+  {
+   "n": 13,
+   "name": "明-2",
+   "file": "img-13.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "ming",
+   "category": "char"
+  },
+  {
+   "n": 14,
+   "name": "明-3",
+   "file": "img-14.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "ming",
+   "category": "char"
+  },
+  {
+   "n": 15,
+   "name": "冥王-1",
+   "file": "img-15.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "mingwang",
+   "category": "char"
+  },
+  {
+   "n": 16,
+   "name": "冥王-2",
+   "file": "img-16.jpg",
+   "w": 1600,
+   "h": 773,
+   "group": "mingwang",
+   "category": "char"
+  },
+  {
+   "n": 17,
+   "name": "冥王-3",
+   "file": "img-17.jpg",
+   "w": 1600,
+   "h": 907,
+   "group": "mingwang",
+   "category": "char"
+  }
+ ]
+}

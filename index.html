@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN" translate="no" class="notranslate">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="google" content="notranslate">
+<title>死神之吻 · 人物资产选择 · Lựa chọn nhân vật</title>
+<style>
+:root{
+  --bg:#0f1115; --card:#1a1d24; --card2:#22262f; --line:#2e3340;
+  --txt:#f2f3f5; --sub:#9aa1ad; --acc:#e8b64c; --acc2:#f5d78e; --ok:#4caf7d; --no:#e05c5c;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang SC","Helvetica Neue",Arial,"Noto Sans",sans-serif;line-height:1.5;padding-bottom:110px}
+.wrap{max-width:720px;margin:0 auto;padding:0 12px}
+header.top{padding:18px 0 6px;text-align:center}
+header.top h1{font-size:20px;line-height:1.35}
+header.top .vi{color:var(--sub);font-size:14px;margin-top:2px}
+header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;line-height:1.6}
+/* 选择人 */
+.who{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
+.who .lab{font-size:13px;font-weight:600}
+.who .lab .vi{display:block;color:var(--sub);font-weight:400;font-size:12px}
+.who .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.who button{background:var(--card2);border:1.5px solid var(--line);color:var(--txt);border-radius:10px;padding:12px 6px;font-size:14px;line-height:1.3}
+.who button .vi{display:block;font-size:11px;color:var(--sub)}
+.who button.on{border-color:var(--acc);background:rgba(232,182,76,.12)}
+.who button.on .vi{color:var(--acc2)}
+/* 说明卡 */
+.guide{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 14px;font-size:13px;color:#d6d9de;line-height:1.7}
+.guide .vi{color:var(--sub);margin-top:6px;font-size:12.5px}
+/* 组 */
+.group{margin:20px 0 6px}
+.group h2{font-size:18px}
+.group h2 .vi{display:block;font-size:13px;color:var(--sub);font-weight:400}
+.group .meta{font-size:11.5px;color:var(--sub);margin:2px 0 10px}
+.group .meta .done{color:var(--ok);font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:12px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .15s}
+.card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#000}
+.card.land img{aspect-ratio:4/3}
+.card .nm{padding:8px 9px 9px;font-size:12.5px;line-height:1.35}
+.card .nm .vi{display:block;font-size:11px;color:var(--sub)}
+.card .chk{position:absolute;top:6px;right:6px;width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.6);border:2.5px solid #fff6;display:flex;align-items:center;justify-content:center;font-size:22px;color:transparent;transition:all .15s;z-index:2}
+.card .chk::before{content:"";position:absolute;inset:-12px}
+.card.sel{border-color:var(--acc)}
+.card.sel .chk{background:var(--acc);border-color:var(--acc);color:#111;font-weight:700}
+/* 同意/不同意（单方案组） */
+.vote{display:flex;gap:10px;margin-top:10px}
+.vote button{flex:1;border-radius:12px;padding:14px 8px;font-size:15px;border:2px solid var(--line);background:var(--card2);color:var(--txt);line-height:1.3}
+.vote button .vi{display:block;font-size:11px;color:var(--sub)}
+.vote button.yes.on{border-color:var(--ok);background:rgba(76,175,125,.15);color:var(--ok);font-weight:700}
+.vote button.no.on{border-color:var(--no);background:rgba(224,92,92,.15);color:var(--no);font-weight:700}
+.reason{margin-top:10px;display:none}
+.reason.show{display:block}
+.reason textarea{width:100%;background:var(--card2);border:1.5px solid var(--line);border-radius:10px;color:var(--txt);padding:10px;font-size:14px;min-height:74px;font-family:inherit;resize:vertical}
+.reason textarea:focus{outline:none;border-color:var(--no)}
+.reason .rq{font-size:12px;color:var(--no);margin-top:4px}
+/* 底部栏 */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(15,17,21,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+.bar .in{max-width:720px;margin:0 auto;display:flex;gap:10px}
+.bar button{flex:1;border-radius:12px;padding:13px 8px;font-size:15px;border:1.5px solid var(--line);background:var(--card2);color:var(--txt);line-height:1.3}
+.bar button .vi{display:block;font-size:10.5px;color:var(--sub)}
+.bar button.primary{background:var(--acc);border-color:var(--acc);color:#111;font-weight:700}
+.bar button.primary .vi{color:#333}
+.bar button:disabled{opacity:.45}
+/* 已选弹层 */
+.sheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:none}
+.sheet.open{display:block}
+.sheet .panel{position:absolute;left:0;right:0;bottom:0;max-height:82vh;background:var(--card);border-radius:18px 18px 0 0;max-width:720px;margin:0 auto;display:flex;flex-direction:column}
+.sheet .hd{padding:14px 16px 10px;border-bottom:1px solid var(--line);font-size:15px;font-weight:600}
+.sheet .hd .vi{display:block;font-size:12px;color:var(--sub);font-weight:400}
+.sheet .list{overflow-y:auto;padding:10px 16px;flex:1}
+.selrow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.selrow img{width:56px;height:70px;object-fit:cover;border-radius:8px;background:#000}
+.selrow .noimg{width:56px;height:70px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:22px}
+.selrow .t{flex:1;font-size:13px}
+.selrow .t .vi{display:block;font-size:11.5px;color:var(--sub)}
+.selrow .g{font-size:10.5px;color:var(--sub);opacity:.8}
+.selrow .miss{color:var(--no)}
+.selrow .rsn{font-size:11px;color:var(--acc2);display:block;margin-top:2px}
+.selrow button{background:none;border:1px solid var(--line);color:var(--sub);border-radius:8px;padding:6px 10px;font-size:12px}
+.sheet .ft{padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px}
+.sheet .ft button{flex:1;border-radius:12px;padding:12px;font-size:14.5px;border:1.5px solid var(--line);background:var(--card2);color:var(--txt)}
+.sheet .ft button.primary{background:var(--acc);border-color:var(--acc);color:#111;font-weight:700}
+/* 大图 */
+.lightbox{position:fixed;inset:0;z-index:70;background:#000;display:none;flex-direction:column}
+.lightbox.open{display:flex}
+.lightbox .lbimg{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.lightbox img{max-width:100%;max-height:100%;object-fit:contain}
+.lightbox .lbcap{padding:12px 16px calc(12px + env(safe-area-inset-bottom));text-align:center;font-size:13.5px}
+.lightbox .lbcap .vi{color:var(--sub);font-size:12px}
+.lightbox .lbbar{display:flex;gap:10px;padding:0 16px 12px}
+.lightbox .lbbar button{flex:1;border-radius:10px;padding:11px;font-size:14px;border:1.5px solid var(--line);background:var(--card2);color:var(--txt)}
+.lightbox .lbbar button.selb{background:var(--acc);border-color:var(--acc);color:#111;font-weight:700}
+.lightbox .x{position:absolute;top:calc(10px + env(safe-area-inset-top));right:12px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;border:none;font-size:18px;z-index:2}
+/* 提交成功 */
+.done{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.done.open{display:flex}
+.done .tick{width:84px;height:84px;border-radius:50%;background:rgba(76,175,125,.15);border:3px solid var(--ok);color:var(--ok);font-size:44px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.done h2{font-size:21px}
+.done .vi{color:var(--sub);font-size:15px;margin-top:2px}
+.done p{font-size:13.5px;color:#d6d9de;margin-top:16px;line-height:1.8;max-width:340px}
+.done p .vi{color:var(--sub);font-size:12.5px}
+.done button{margin-top:22px;border-radius:12px;padding:13px 26px;font-size:15px;border:1.5px solid var(--line);background:var(--card2);color:var(--txt)}
+/* 提交进度 */
+.prog{position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center}
+.prog.open{display:flex}
+.prog .box{background:var(--card);border-radius:14px;padding:22px 26px;text-align:center;max-width:80%;font-size:14px}
+.prog .box .vi{color:var(--sub);font-size:12px}
+.toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);background:#000d;border:1px solid var(--line);padding:10px 16px;border-radius:10px;font-size:13px;z-index:90;display:none;max-width:86%;text-align:center}
+@media(min-width:560px){.grid{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1 id="t_zh"></h1>
+    <div class="vi" id="t_vi"></div>
+    <div class="spec" id="t_spec"></div>
+  </header>
+
+  <div class="who">
+    <div class="lab">① 本次选择人 / 请选择您的身份<span class="vi">Người chọn / Vui lòng chọn bạn là ai</span></div>
+    <div class="btns" id="whoBtns"></div>
+  </div>
+
+  <div class="guide">
+    ② 每个角色选 <b>1 个</b>方案：点图片看大图，点右上角圆钮选择。全部选完后点底部「确认提交」。提交后 Stephen 会收到你的选择，<b>你无需下载任何文件</b>。
+    <div class="vi">② Chọn <b>1</b> phương án cho mỗi nhân vật: chạm ảnh để phóng to, chạm nút tròn góc phải để chọn. Chọn xong tất cả, bấm 「Xác nhận gửi」ở cuối trang. Stephen sẽ nhận được lựa chọn của bạn, <b>bạn không cần tải file nào</b>.</div>
+  </div>
+
+  <div id="content"></div>
+</div>
+
+<div class="bar">
+  <div class="in">
+    <button id="btnReview">查看已选 <span id="cntA">0/0</span><span class="vi">Xem đã chọn</span></button>
+    <button class="primary" id="btnSubmit">确认提交<span class="vi">Xác nhận gửi</span></button>
+  </div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="panel">
+    <div class="hd">我的选择 <span id="cntB">0/0</span><span class="vi">Lựa chọn của tôi</span></div>
+    <div class="list" id="selList"></div>
+    <div class="ft">
+      <button id="btnClose">返回 / Quay lại</button>
+      <button class="primary" id="btnSubmit2">确认提交 / Xác nhận gửi</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lb">
+  <button class="x" id="lbX">✕</button>
+  <div class="lbimg"><img id="lbImg"></div>
+  <div class="lbcap" id="lbCap"></div>
+  <div class="lbbar"><button id="lbSel"></button></div>
+</div>
+
+<div class="prog" id="prog"><div class="box">
+  正在提交…<br><span class="vi">Đang gửi…</span>
+</div></div>
+
+<div class="done" id="done">
+  <div class="tick">✓</div>
+  <h2>提交成功</h2>
+  <div class="vi">Gửi thành công</div>
+  <p id="doneMsg">Stephen 已收到你的选择结果，<b>你无需下载或转发任何文件</b>。<br><span class="vi">Stephen đã nhận được kết quả của bạn, <b>bạn không cần tải hay chuyển tiếp file nào</b>.</span></p>
+  <button id="btnAgain">修改并重新提交 / Chỉnh sửa và gửi lại</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+let P=null, M=null, WHO=null, LB_CTX=null;
+// SEL: { groupId: {type:'pick', item:n} | {type:'vote', agree:bool, reason:str} }
+let SEL={};
+const $=id=>document.getElementById(id);
+
+function save(){ localStorage.setItem(P.storageKey, JSON.stringify({sel:SEL,who:WHO})); }
+function load(){ try{const d=JSON.parse(localStorage.getItem(P.storageKey));if(d){SEL=d.sel||{};WHO=(typeof d.who==='number')?d.who:null;}}catch(e){} }
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2600);}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function groupItems(gid){return M.items.filter(i=>i.group===gid);}
+function itemName(it){
+  const g=M.groups.find(g=>g.id===it.group);
+  const m=it.name.match(/-(\d+)$/);
+  const bzh=it.izh||g.zh, bvi=it.ivi||g.vi;
+  return {zh:bzh+(m?' 方案'+m[1]:''), vi:bvi+(m?' — Phương án '+m[1]:''), raw:it.name};
+}
+function totalGroups(){return M.groups.filter(g=>groupItems(g.id).length>0).length;}
+function doneCount(){return M.groups.filter(g=>SEL[g.id]).length;}
+
+async function boot(){
+  [P,M]=await Promise.all([fetch('project.json').then(r=>r.json()),fetch('manifest.json').then(r=>r.json())]);
+  load();
+  $('t_zh').textContent=P.title_zh;
+  $('t_vi').textContent=P.title_vi;
+  $('t_spec').textContent=P.subtitle_zh+'　|　'+P.subtitle_vi;
+  renderWho(); renderContent(); refreshCounts();
+  window.__app={get P(){return P},get M(){return M},get SEL(){return SEL},get WHO(){return WHO},submit};
+}
+
+function renderWho(){
+  const b=$('whoBtns'); b.innerHTML='';
+  P.choosers.forEach((c,i)=>{
+    const btn=document.createElement('button');
+    btn.innerHTML=esc(c.zh)+'<span class="vi">'+esc(c.vi)+'</span>';
+    if(WHO===i)btn.classList.add('on');
+    btn.onclick=()=>{WHO=i;save();renderWho();toast('本次选择人 / Người chọn: '+c.zh);};
+    b.appendChild(btn);
+  });
+}
+
+function renderContent(){
+  const c=$('content'); c.innerHTML='';
+  M.groups.forEach(g=>{
+    const items=groupItems(g.id);
+    if(!items.length)return;
+    const sec=document.createElement('div'); sec.className='group'; sec.id='grp_'+g.id;
+    const st=SEL[g.id];
+    const stTxt=st?'<span class="done">✓ 已选 / Đã chọn</span>':'未选 / Chưa chọn';
+    sec.innerHTML='<h2>'+esc(g.zh)+'<span class="vi">'+esc(g.vi)+'</span></h2>'+
+      '<div class="meta" id="meta_'+g.id+'">共 '+items.length+' 个方案 / '+items.length+' phương án · '+stTxt+'</div>';
+    const grid=document.createElement('div'); grid.className='grid';
+    items.forEach(it=>{
+      const nm=itemName(it);
+      const card=document.createElement('div');
+      const picked=st&&st.type==='pick'&&st.item===it.n;
+      card.className='card'+(it.w<it.h?'':' land')+(picked?' sel':'');
+      card.id='card'+it.n;
+      card.innerHTML='<img loading="lazy" src="'+it.file+'" alt="">'+
+        '<div class="chk">✓</div>'+
+        '<div class="nm">'+esc(nm.zh)+'<span class="vi">'+esc(nm.vi)+'</span></div>';
+      card.onclick=()=>openLB(g,it);
+      card.querySelector('.chk').onclick=(e)=>{e.stopPropagation();pick(g,it);};
+      card.querySelector('.nm').onclick=(e)=>{e.stopPropagation();pick(g,it);};
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);
+    // 单方案组：同意/不同意 + 理由
+    if(items.length===1){
+      const v=document.createElement('div'); v.className='vote';
+      const agreed=st&&st.type==='vote'&&st.agree===true;
+      const disagreed=st&&st.type==='vote'&&st.agree===false;
+      v.innerHTML='<button class="yes'+(agreed?' on':'')+'" id="vy_'+g.id+'">同意<span class="vi">Đồng ý</span></button>'+
+                  '<button class="no'+(disagreed?' on':'')+'" id="vn_'+g.id+'">不同意<span class="vi">Không đồng ý</span></button>';
+      sec.appendChild(v);
+      const r=document.createElement('div'); r.className='reason'+(disagreed?' show':''); r.id='rs_'+g.id;
+      r.innerHTML='<textarea id="rt_'+g.id+'" placeholder="请写明不同意的理由（必填）/ Vui lòng ghi rõ lý do không đồng ý (bắt buộc)">'+esc(disagreed&&st.reason||'')+'</textarea>'+
+                  '<div class="rq" id="rq_'+g.id+'" style="display:none">请填写理由 / Vui lòng điền lý do</div>';
+      sec.appendChild(r);
+      v.querySelector('#vy_'+g.id).onclick=()=>vote(g,true);
+      v.querySelector('#vn_'+g.id).onclick=()=>vote(g,false);
+      r.querySelector('textarea').oninput=(e)=>{if(SEL[g.id]){SEL[g.id].reason=e.target.value;save();}};
+    }
+    c.appendChild(sec);
+  });
+}
+
+/* 多方案组：单选 */
+function pick(g,it){
+  const st=SEL[g.id];
+  if(st&&st.type==='pick'&&st.item===it.n){ delete SEL[g.id]; } // 再点已选的 = 取消
+  else SEL[g.id]={type:'pick',item:it.n};
+  save(); refreshGroup(g); refreshCounts(); syncLB();
+}
+/* 单方案组：同意/不同意 */
+function vote(g,agree){
+  const prev=SEL[g.id];
+  SEL[g.id]={type:'vote',agree,reason:(prev&&prev.reason)||''};
+  save(); renderContent(); refreshCounts();
+}
+function refreshGroup(g){
+  const items=groupItems(g.id);
+  const st=SEL[g.id];
+  items.forEach(it=>{
+    const card=$('card'+it.n);
+    if(card)card.classList.toggle('sel',!!(st&&st.type==='pick'&&st.item===it.n));
+  });
+  const meta=$('meta_'+g.id);
+  if(meta){
+    const base='共 '+items.length+' 个方案 / '+items.length+' phương án · ';
+    meta.innerHTML=base+(st?'<span class="done">✓ 已选 / Đã chọn</span>':'未选 / Chưa chọn');
+  }
+}
+function refreshCounts(){
+  const d=doneCount(), t=totalGroups();
+  $('cntA').textContent=d+'/'+t; $('cntB').textContent=d+'/'+t;
+}
+
+/* 已选清单 */
+function openReview(){
+  const list=$('selList'); list.innerHTML='';
+  M.groups.forEach(g=>{
+    const items=groupItems(g.id);
+    if(!items.length)return;
+    const st=SEL[g.id];
+    const row=document.createElement('div'); row.className='selrow';
+    if(!st){
+      row.innerHTML='<div class="noimg">?</div><div class="t"><span class="miss">'+esc(g.zh)+'：还未选择</span><span class="vi miss">'+esc(g.vi)+': chưa chọn</span></div>';
+    }else if(st.type==='pick'){
+      const it=items.find(i=>i.n===st.item);
+      const nm=itemName(it);
+      row.innerHTML='<img src="'+it.file+'"><div class="t">'+esc(nm.zh)+'<span class="vi">'+esc(nm.vi)+'</span></div><button>取消<br>Bỏ chọn</button>';
+      row.querySelector('button').onclick=()=>{delete SEL[g.id];save();refreshGroup(g);refreshCounts();openReview();};
+    }else{
+      const it=items[0];
+      row.innerHTML='<img src="'+it.file+'"><div class="t">'+(st.agree?'✓ 同意 ':'✗ 不同意 ')+esc(g.zh)+
+        '<span class="vi">'+(st.agree?'Đồng ý ':'Không đồng ý ')+esc(g.vi)+'</span>'+
+        (!st.agree&&st.reason?'<span class="rsn">理由 / Lý do: '+esc(st.reason)+'</span>':'')+'</div>';
+    }
+    list.appendChild(row);
+  });
+  $('sheet').classList.add('open');
+}
+$('btnReview').onclick=openReview;
+$('btnClose').onclick=()=>$('sheet').classList.remove('open');
+$('sheet').onclick=(e)=>{if(e.target.id==='sheet')$('sheet').classList.remove('open');};
+
+/* 大图 */
+function openLB(g,it){
+  LB_CTX={g,it};
+  $('lbImg').src=it.file;
+  const nm=itemName(it);
+  $('lbCap').innerHTML=esc(nm.zh)+'<br><span class="vi">'+esc(nm.vi)+'</span>';
+  syncLB();
+  $('lb').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function syncLB(){
+  if(!LB_CTX)return;
+  const st=SEL[LB_CTX.g.id];
+  const on=!!(st&&st.type==='pick'&&st.item===LB_CTX.it.n);
+  $('lbSel').textContent=on?'✓ 已选择 / Đã chọn（点击取消 bỏ chọn）':'＋ 选择这个 / Chọn ảnh này';
+  $('lbSel').className=on?'selb':'';
+}
+$('lbSel').onclick=()=>pick(LB_CTX.g,LB_CTX.it);
+$('lbX').onclick=()=>{$('lb').classList.remove('open');document.body.style.overflow='';};
+
+/* ===== 提交 ===== */
+function validate(){
+  if(WHO===null){toast('请先在页面顶部选择您的身份 / Vui lòng chọn bạn là ai ở đầu trang');window.scrollTo(0,0);return false;}
+  for(const g of M.groups){
+    const items=groupItems(g.id);
+    if(!items.length)continue;
+    const st=SEL[g.id];
+    if(!st){
+      toast('还有角色未选择：'+g.zh+' / Còn nhân vật chưa chọn: '+g.vi);
+      const el=$('grp_'+g.id); if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+      return false;
+    }
+    if(st.type==='vote'&&st.agree===false&&!(st.reason||'').trim()){
+      const rq=$('rq_'+g.id); if(rq)rq.style.display='block';
+      const rt=$('rt_'+g.id); if(rt)rt.focus();
+      toast('请写明不同意的理由 / Vui lòng ghi rõ lý do không đồng ý');
+      return false;
+    }
+  }
+  return true;
+}
+async function submit(){
+  if(!validate())return;
+  $('sheet').classList.remove('open');
+  $('prog').classList.add('open');
+  const who=P.choosers[WHO];
+  const choices=M.groups.filter(g=>SEL[g.id]).map(g=>{
+    const st=SEL[g.id];
+    const items=groupItems(g.id);
+    const base={group:g.id,group_zh:g.zh,group_vi:g.vi,type:st.type};
+    if(st.type==='pick'){
+      const it=items.find(i=>i.n===st.item);
+      return Object.assign(base,{item:st.item,name:it?it.name:null,file:it?it.file:null});
+    }
+    const it=items[0];
+    return Object.assign(base,{agree:st.agree,reason:st.agree?'':(st.reason||'').trim(),name:it?it.name:null,file:it?it.file:null});
+  });
+  const payload={
+    project:CONFIG.PROJECT_ID,
+    selector:who.zh+' / '+who.vi,
+    data:{who:WHO,who_zh:who.zh,who_vi:who.vi,choices,client_time:new Date().toISOString(),ua:navigator.userAgent.slice(0,200)}
+  };
+  try{
+    const r=await fetch(CONFIG.SUPABASE_URL+'/rest/v1/submissions',{
+      method:'POST',
+      headers:{'apikey':CONFIG.SUPABASE_KEY,'Authorization':'Bearer '+CONFIG.SUPABASE_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    $('prog').classList.remove('open');
+    $('doneMsg').innerHTML='Stephen 已收到 <b>'+esc(who.zh)+'</b> 的选择结果（'+choices.length+' 个角色），<b>你无需下载或转发任何文件</b>。<br><span class="vi">Stephen đã nhận được kết quả của <b>'+esc(who.vi)+'</b> ('+choices.length+' nhân vật), <b>bạn không cần tải hay chuyển tiếp file nào</b>.</span>';
+    $('done').classList.add('open');
+    document.body.style.overflow='hidden';
+  }catch(e){
+    $('prog').classList.remove('open');
+    toast('提交失败，请检查网络后重试 / Gửi thất bại, vui lòng kiểm tra mạng và thử lại');
+  }
+}
+$('btnSubmit').onclick=submit;
+$('btnSubmit2').onclick=submit;
+$('btnAgain').onclick=()=>{$('done').classList.remove('open');document.body.style.overflow='';window.scrollTo(0,0);};
+
+boot().catch(e=>{document.body.innerHTML='<div style="padding:40px;text-align:center">加载失败 / Lỗi tải: '+e.message+'</div>';});
+</script>
+</body>
+</html>

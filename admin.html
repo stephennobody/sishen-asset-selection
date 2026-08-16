@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN" translate="no" class="notranslate">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="google" content="notranslate">
+<title>资产选择后台 · Admin</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0f1115; --card:#1a1d24; --card2:#22262f; --line:#2e3340;
+  --txt:#f2f3f5; --sub:#9aa1ad; --acc:#e8b64c; --acc2:#f5d78e; --ok:#4caf7d; --no:#e05c5c;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang SC","Helvetica Neue",Arial,sans-serif;line-height:1.5}
+.wrap{max-width:820px;margin:0 auto;padding:16px 12px 60px}
+h1{font-size:20px;text-align:center;padding:8px 0 2px}
+.sub{text-align:center;color:var(--sub);font-size:12.5px;margin-bottom:16px}
+/* 登录 */
+.gate{max-width:360px;margin:80px auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 22px;text-align:center}
+.gate h2{font-size:17px;margin-bottom:14px}
+.gate input{width:100%;background:var(--card2);border:1.5px solid var(--line);border-radius:10px;color:var(--txt);padding:12px;font-size:15px;text-align:center}
+.gate input:focus{outline:none;border-color:var(--acc)}
+.gate button{width:100%;margin-top:12px;border-radius:12px;padding:13px;font-size:15px;border:none;background:var(--acc);color:#111;font-weight:700}
+.gate .err{color:var(--no);font-size:12.5px;margin-top:10px;display:none}
+/* 项目卡 */
+.pj{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.pj .nm{font-size:16px;font-weight:700}
+.pj .vi{color:var(--sub);font-size:12.5px;font-weight:400;margin-left:6px}
+.pj .st{font-size:12.5px;color:var(--sub);margin-top:6px}
+.pj .st b{color:var(--acc)}
+.pj .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pj button,.pj a.btn{border-radius:10px;padding:9px 14px;font-size:13px;border:1.5px solid var(--line);background:var(--card2);color:var(--txt);text-decoration:none;cursor:pointer}
+.pj button.primary{background:var(--acc);border-color:var(--acc);color:#111;font-weight:700}
+/* 选择人状态 */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{font-size:12px;border-radius:20px;padding:5px 12px;border:1.5px solid var(--line);color:var(--sub)}
+.chip.ok{border-color:var(--ok);color:var(--ok)}
+/* 提交记录 */
+.sub2{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.sub2 .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.sub2 .who{font-size:15px;font-weight:700}
+.sub2 .time{font-size:12px;color:var(--sub)}
+.sub2 .items{margin-top:10px}
+.srow{display:flex;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.srow img{width:52px;height:66px;object-fit:cover;border-radius:8px;background:#000}
+.srow .t{flex:1;font-size:13px}
+.srow .t .vi{display:block;font-size:11.5px;color:var(--sub)}
+.srow .v-ok{color:var(--ok);font-weight:700}
+.srow .v-no{color:var(--no);font-weight:700}
+.srow .rsn{font-size:11.5px;color:var(--acc2);display:block}
+.sub2 .acts{display:flex;gap:8px;margin-top:12px}
+.sub2 .acts button{flex:1;border-radius:10px;padding:11px;font-size:13.5px;border:1.5px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer}
+.sub2 .acts button.primary{background:var(--acc);border-color:var(--acc);color:#111;font-weight:700}
+.secT{font-size:15px;font-weight:700;margin:22px 0 4px;color:var(--acc2)}
+.back{color:var(--sub);font-size:13px;text-decoration:none}
+.toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);background:#000d;border:1px solid var(--line);padding:10px 16px;border-radius:10px;font-size:13px;z-index:90;display:none;max-width:86%;text-align:center}
+.prog{position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center}
+.prog.open{display:flex}
+.prog .box{background:var(--card);border-radius:14px;padding:22px 26px;text-align:center;font-size:14px}
+.prog .pct{font-size:24px;font-weight:700;color:var(--acc);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="gate" id="gate">
+  <h2>资产选择后台 · 请输入密码</h2>
+  <input type="password" id="pw" placeholder="密码 / Mật khẩu" autocomplete="off">
+  <button id="pwGo">进入后台</button>
+  <div class="err" id="pwErr">密码错误 / Sai mật khẩu</div>
+</div>
+
+<div class="wrap" id="main" style="display:none">
+  <h1>资产选择后台</h1>
+  <div class="sub">所有项目的选择结果汇总 · Stephen 专用</div>
+  <div id="pjList"></div>
+  <div id="detail"></div>
+</div>
+
+<div class="prog" id="prog"><div class="box">
+  <div>正在生成 PDF…</div>
+  <div class="pct" id="pct">0%</div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+const PASS_SHA256='51710f419f2b767c99bddc6918b573a9f9cb41fc50d55ca70ec0af0ca2df1b40'; // stephen2026
+const $=id=>document.getElementById(id);
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2600);}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+async function sha256(s){
+  const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+async function tryLogin(){
+  const h=await sha256($('pw').value);
+  if(h===PASS_SHA256){
+    sessionStorage.setItem('admin_ok','1');
+    $('gate').style.display='none';$('main').style.display='block';
+    renderProjects();
+  }else{$('pwErr').style.display='block';}
+}
+$('pwGo').onclick=tryLogin;
+$('pw').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
+if(sessionStorage.getItem('admin_ok')==='1'){$('gate').style.display='none';$('main').style.display='block';renderProjects();}
+
+/* ===== 项目总览 ===== */
+async function fetchSubs(pid){
+  const r=await fetch(CONFIG.SUPABASE_URL+'/rest/v1/submissions?project=eq.'+encodeURIComponent(pid)+'&order=created_at.desc',{
+    headers:{'apikey':CONFIG.SUPABASE_KEY,'Authorization':'Bearer '+CONFIG.SUPABASE_KEY}
+  });
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r.json();
+}
+async function renderProjects(){
+  const box=$('pjList'); box.innerHTML=''; $('detail').innerHTML='';
+  for(const p of PROJECTS){
+    const div=document.createElement('div'); div.className='pj';
+    let extra='';
+    if(p.backend){
+      extra='<div class="st">读取中…</div>';
+    }else{
+      extra='<div class="st">'+esc(p.note||'')+'</div>';
+    }
+    div.innerHTML='<div class="nm">'+esc(p.zh)+'<span class="vi">'+esc(p.vi||'')+'</span></div>'+extra+
+      '<div class="row"><a class="btn" href="'+p.url+'" target="_blank">打开选择页 ↗</a>'+
+      (p.backend?'<button class="primary" data-id="'+p.id+'">查看选择结果</button>':'')+'</div>';
+    box.appendChild(div);
+    if(p.backend){
+      const btn=div.querySelector('button.primary');
+      btn.onclick=()=>renderDetail(p);
+      try{
+        const subs=await fetchSubs(p.id);
+        window['_subs_'+p.id]=subs;
+        // 每个选择人最新一条
+        const latest={};
+        subs.forEach(s=>{if(!latest[s.selector])latest[s.selector]=s;});
+        const whoList=Object.keys(latest);
+        div.querySelector('.st').innerHTML='共 <b>'+subs.length+'</b> 次提交 · <b>'+whoList.length+'</b> 人已选'+
+          '<div class="chips">'+whoList.map(w=>'<span class="chip ok">✓ '+esc(w.split(' / ')[0])+'</span>').join('')+'</div>';
+      }catch(e){
+        div.querySelector('.st').textContent='读取失败：'+e.message;
+      }
+    }
+  }
+}
+
+/* ===== 项目详情：提交记录 ===== */
+let CUR_P=null;
+async function renderDetail(p){
+  CUR_P=p;
+  const d=$('detail'); d.innerHTML='';
+  const subs=window['_subs_'+p.id]||await fetchSubs(p.id);
+  // 加载该项目 manifest 供 PDF 用
+  if(p.manifest&&!window['_mf_'+p.id]){
+    const [pj,mf]=await Promise.all([fetch(p.projectJson).then(r=>r.json()),fetch(p.manifest).then(r=>r.json())]);
+    window['_mf_'+p.id]={P:pj,M:mf};
+  }
+  const t=document.createElement('div');
+  t.innerHTML='<div class="secT">'+esc(p.zh)+' · 提交记录（'+subs.length+'）</div>';
+  d.appendChild(t);
+  if(!subs.length){
+    const e=document.createElement('div');e.className='sub2';e.textContent='还没有人提交。';d.appendChild(e);
+  }
+  subs.forEach((s,idx)=>{
+    const div=document.createElement('div'); div.className='sub2';
+    const time=new Date(s.created_at).toLocaleString('zh-CN',{hour12:false});
+    const ch=(s.data&&s.data.choices)||[];
+    let rows='';
+    ch.forEach(c=>{
+      if(c.type==='pick'){
+        rows+='<div class="srow">'+(c.file?'<img src="'+c.file+'">':'')+
+          '<div class="t">'+esc(c.group_zh)+' → <b>'+esc(c.name||'')+'</b><span class="vi">'+esc(c.group_vi||'')+'</span></div></div>';
+      }else{
+        rows+='<div class="srow">'+(c.file?'<img src="'+c.file+'">':'')+
+          '<div class="t">'+(c.agree?'<span class="v-ok">✓ 同意</span> ':'<span class="v-no">✗ 不同意</span> ')+esc(c.group_zh)+
+          '<span class="vi">'+esc(c.group_vi||'')+'</span>'+
+          (!c.agree&&c.reason?'<span class="rsn">理由：'+esc(c.reason)+'</span>':'')+'</div></div>';
+      }
+    });
+    div.innerHTML='<div class="hd"><span class="who">'+esc(s.selector)+'</span><span class="time">'+time+(idx===0?' · 最新':'')+'</span></div>'+
+      '<div class="items">'+rows+'</div>'+
+      '<div class="acts"><button class="primary pdf">下载此结果 PDF</button></div>';
+    div.querySelector('.pdf').onclick=()=>exportPDF(p,s);
+    d.appendChild(div);
+  });
+  window.scrollTo(0,0);
+  $('detail').scrollIntoView();
+}
+
+/* ===== PDF 生成（和选择页同款范式） ===== */
+function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>res(i);i.onerror=rej;i.src=src;});}
+const PW=1240, PH=1754;
+function newPage(){const c=document.createElement('canvas');c.width=PW;c.height=PH;const x=c.getContext('2d');x.fillStyle='#ffffff';x.fillRect(0,0,PW,PH);return[c,x];}
+function wrapText(x,text,maxW){
+  const lines=[];let line='';
+  for(const ch of text){const t=line+ch;
+    if(x.measureText(t).width>maxW&&line){lines.push(line);line=ch;}else line=t;}
+  if(line)lines.push(line);return lines;
+}
+function drawText(x,text,y,maxW,font,color,lh){
+  x.font=font;x.fillStyle=color;
+  for(const l of wrapText(x,text,maxW)){x.fillText(l,70,y);y+=lh;}
+  return y;
+}
+function drawImgFit(x,img,bx,by,bw,bh){
+  const r=Math.min(bw/img.width,bh/img.height);
+  const w=img.width*r,h=img.height*r;
+  x.drawImage(img,bx+(bw-w)/2,by+(bh-h)/2,w,h);
+}
+async function exportPDF(p,s){
+  const {P,M}=window['_mf_'+p.id];
+  const ch=(s.data&&s.data.choices)||[];
+  if(!ch.length){toast('这条提交没有内容');return;}
+  $('prog').classList.add('open');
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({unit:'mm',format:'a4'});
+  let first=true;
+  const addPage=c=>{if(!first)pdf.addPage();first=false;pdf.addImage(c.toDataURL('image/jpeg',0.85),'JPEG',0,0,210,297);};
+  const time=new Date(s.created_at);
+  const dstr=time.getFullYear()+'-'+String(time.getMonth()+1).padStart(2,'0')+'-'+String(time.getDate()).padStart(2,'0');
+  try{
+    // 封面
+    let[c,x]=newPage();
+    let y=220;
+    y=drawText(x,P.title_zh,y,PW-140,'bold 54px sans-serif','#111',72);
+    y=drawText(x,P.title_vi,y+10,PW-140,'34px sans-serif','#555',50);
+    y+=40;
+    y=drawText(x,'选择人 / Người chọn：'+s.selector,y,PW-140,'bold 38px sans-serif','#8a5a00',56);
+    y=drawText(x,'提交时间 / Thời gian：'+time.toLocaleString('zh-CN',{hour12:false}),y+6,PW-140,'30px sans-serif','#333',44);
+    y=drawText(x,'共选择 / Tổng：'+ch.length+' 项 / mục',y+6,PW-140,'30px sans-serif','#333',44);
+    addPage(c);
+    // 每项一页
+    for(let k=0;k<ch.length;k++){
+      const it=ch[k];
+      $('pct').textContent=Math.round(k/ch.length*100)+'%';
+      [c,x]=newPage();
+      x.font='24px sans-serif';x.fillStyle='#999';x.fillText((k+1)+' / '+ch.length,70,80);
+      let yy=110;
+      if(it.type==='pick'){
+        yy=drawText(x,it.group_zh+' → '+(it.name||''),yy,PW-140,'bold 44px sans-serif','#111',60);
+        yy=drawText(x,it.group_vi||'',yy,PW-140,'30px sans-serif','#555',44);
+      }else{
+        yy=drawText(x,(it.agree?'✓ 同意 / Đồng ý':'✗ 不同意 / Không đồng ý')+'：'+it.group_zh,yy,PW-140,'bold 40px sans-serif',it.agree?'#1c7a4d':'#b03030',56);
+        if(!it.agree&&it.reason)yy=drawText(x,'理由 / Lý do：'+it.reason,yy+6,PW-140,'28px sans-serif','#333',42);
+      }
+      if(it.file){
+        try{
+          const img=await loadImg(it.file);
+          const top=yy+30, bot=PH-90;
+          x.fillStyle='#f4f4f4';x.fillRect(70,top,PW-140,bot-top);
+          drawImgFit(x,img,80,top+10,PW-160,bot-top-20);
+        }catch(e){}
+      }
+      addPage(c);
+      await new Promise(r=>setTimeout(r,10));
+    }
+    $('pct').textContent='100%';
+    const whoZh=(s.data&&s.data.who_zh)||s.selector.split(' / ')[0];
+    const fname=(P.export_prefix||'选择结果')+'_'+whoZh.replace(/\s/g,'')+'_'+dstr+'.pdf';
+    const blob=pdf.output('blob');
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;
+    document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),4000);
+    toast('PDF 已下载 / Đã tải PDF');
+  }catch(e){
+    toast('生成失败：'+e.message);
+  }
+  $('prog').classList.remove('open');
+}
+</script>
+</body>
+</html>
