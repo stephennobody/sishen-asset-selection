@@ -135,8 +135,8 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
   </div>
 
   <div class="guide">
-    ② 主角每个角色选 <b>1 个</b>方案：点图片看大图，点右上角圆钮选择。带「含多视图」标签的方案，大图里有定妆照+多视图，宽图可左右滑动细看。下方「其他配角」每个角色只需点<b>同意</b>或<b>不同意（需写理由）</b>。全部完成后点底部「确认提交」。提交后 Stephen 会收到你的选择，<b>你无需下载任何文件</b>。
-    <div class="vi">② Với nhân vật chính, chọn <b>1</b> phương án cho mỗi nhân vật: chạm ảnh để phóng to, chạm nút tròn góc phải để chọn. Phương án có nhãn 「Nhiều góc nhìn」mở ra sẽ thấy ảnh định trang + nhiều góc nhìn, ảnh rộng vuốt ngang để xem chi tiết. Phần 「Vai phụ」bên dưới, mỗi nhân vật chỉ cần bấm <b>Đồng ý</b> hoặc <b>Không đồng ý (ghi rõ lý do)</b>. Hoàn tất tất cả, bấm 「Xác nhận gửi」ở cuối trang. Stephen sẽ nhận được lựa chọn của bạn, <b>bạn không cần tải file nào</b>.</div>
+    ② 主角每个角色选 <b>1 个</b>方案：卡片直接显示完整多视图表，点图片看大图（带「含定妆照」标签的方案还能看到定妆照），宽图可左右滑动细看。点右上角圆钮选择。下方「其他配角」每个角色只需点<b>同意</b>或<b>不同意（需写理由）</b>。全部完成后点底部「确认提交」。提交后 Stephen 会收到你的选择，<b>你无需下载任何文件</b>。
+    <div class="vi">② Với nhân vật chính, chọn <b>1</b> phương án cho mỗi nhân vật: thẻ hiển thị sẵn bảng nhiều góc nhìn, chạm ảnh để phóng to (phương án có nhãn 「Có ảnh định trang」xem thêm được ảnh định trang), ảnh rộng vuốt ngang để xem chi tiết. Chạm nút tròn góc phải để chọn. Phần 「Vai phụ」bên dưới, mỗi nhân vật chỉ cần bấm <b>Đồng ý</b> hoặc <b>Không đồng ý (ghi rõ lý do)</b>. Hoàn tất tất cả, bấm 「Xác nhận gửi」ở cuối trang. Stephen sẽ nhận được lựa chọn của bạn, <b>bạn không cần tải file nào</b>.</div>
   </div>
 
   <div id="content"></div>
@@ -247,7 +247,7 @@ function renderContent(){
       card.id='card'+it.n;
       card.innerHTML='<img loading="lazy" src="'+it.file+'" alt="">'+
         '<div class="chk">✓</div>'+
-        (it.extra?'<div class="badge">含多视图 / Nhiều góc nhìn</div>':'')+
+        (it.extra?'<div class="badge">'+esc(it.badge||'含多视图 / Nhiều góc nhìn')+'</div>':'')+
         '<div class="nm">'+esc(nm.zh)+'<span class="vi">'+esc(nm.vi)+'</span></div>';
       card.onclick=()=>openLB(g,it);
       card.querySelector('.chk').onclick=(e)=>{e.stopPropagation();pick(g,it);};
@@ -346,8 +346,8 @@ $('sheet').onclick=(e)=>{if(e.target.id==='sheet')$('sheet').classList.remove('o
 function openLB(g,it){
   LB_CTX={g,it};
   const box=$('lbImgs'); box.innerHTML='';
-  const figs=[{src:it.file,w:it.w,h:it.h,cap:it.extra?'定妆照 / Ảnh định trang':''}];
-  if(it.extra)figs.push({src:it.extra,w:it.ew,h:it.eh,cap:'多视图 / Nhiều góc nhìn'});
+  const figs=[{src:it.file,w:it.w,h:it.h,cap:it.extra?(it.flab||'定妆照 / Ảnh định trang'):''}];
+  if(it.extra)figs.push({src:it.extra,w:it.ew,h:it.eh,cap:it.xlab||'多视图 / Nhiều góc nhìn'});
   figs.forEach(f=>{
     const wide=f.w>f.h*1.4;
     const d=document.createElement('div');
@@ -403,7 +403,7 @@ async function submit(){
     const base={group:g.id,group_zh:g.zh,group_vi:g.vi,type:st.type};
     if(st.type==='pick'){
       const it=items.find(i=>i.n===st.item);
-      return Object.assign(base,{item:st.item,name:it?it.name:null,file:it?it.file:null,extra:it&&it.extra?it.extra:null,ew:it&&it.ew?it.ew:null,eh:it&&it.eh?it.eh:null});
+      return Object.assign(base,{item:st.item,name:it?it.name:null,file:it?it.file:null,extra:it&&it.extra?it.extra:null,ew:it&&it.ew?it.ew:null,eh:it&&it.eh?it.eh:null,flab:it&&it.flab?it.flab:null,xlab:it&&it.xlab?it.xlab:null});
     }
     const it=items[0];
     return Object.assign(base,{agree:st.agree,reason:st.agree?'':(st.reason||'').trim(),name:it?it.name:null,file:it?it.file:null});
