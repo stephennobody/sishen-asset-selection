@@ -39,7 +39,9 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .card{background:var(--card);border:2px solid var(--line);border-radius:12px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .15s}
 .card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#000}
-.card.land img{aspect-ratio:4/3}
+.card.wide{grid-column:1/-1}
+.card.wide img{aspect-ratio:auto;object-fit:contain;background:#111}
+.card .badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.65);border-radius:6px;padding:3px 8px;font-size:10.5px;color:var(--acc2);z-index:2}
 .card .nm{padding:8px 9px 9px;font-size:12.5px;line-height:1.35}
 .card .nm .vi{display:block;font-size:11px;color:var(--sub)}
 .card .chk{position:absolute;top:6px;right:6px;width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.6);border:2.5px solid #fff6;display:flex;align-items:center;justify-content:center;font-size:22px;color:transparent;transition:all .15s;z-index:2}
@@ -87,9 +89,14 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
 /* 大图 */
 .lightbox{position:fixed;inset:0;z-index:70;background:#000;display:none;flex-direction:column}
 .lightbox.open{display:flex}
-.lightbox .lbimg{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.lightbox img{max-width:100%;max-height:100%;object-fit:contain}
-.lightbox .lbcap{padding:12px 16px calc(12px + env(safe-area-inset-bottom));text-align:center;font-size:13.5px}
+.lightbox .lbimg{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.lbfig{display:flex;flex-direction:column;min-height:0}
+.lbfig .figwrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:40vh}
+.lbfig img{max-width:100%;max-height:100%;object-fit:contain}
+.lbfig.wide .figwrap{overflow-x:auto;justify-content:flex-start}
+.lbfig.wide img{max-width:none;max-height:none;height:72vh;width:auto}
+.lbfig .figcap{text-align:center;font-size:11.5px;color:var(--sub);padding:6px 0 2px}
+.lightbox .lbcap{padding:10px 16px 6px;text-align:center;font-size:13.5px}
 .lightbox .lbcap .vi{color:var(--sub);font-size:12px}
 .lightbox .lbbar{display:flex;gap:10px;padding:0 16px 12px}
 .lightbox .lbbar button{flex:1;border-radius:10px;padding:11px;font-size:14px;border:1.5px solid var(--line);background:var(--card2);color:var(--txt)}
@@ -127,8 +134,8 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
   </div>
 
   <div class="guide">
-    ② 每个角色选 <b>1 个</b>方案：点图片看大图，点右上角圆钮选择。全部选完后点底部「确认提交」。提交后 Stephen 会收到你的选择，<b>你无需下载任何文件</b>。
-    <div class="vi">② Chọn <b>1</b> phương án cho mỗi nhân vật: chạm ảnh để phóng to, chạm nút tròn góc phải để chọn. Chọn xong tất cả, bấm 「Xác nhận gửi」ở cuối trang. Stephen sẽ nhận được lựa chọn của bạn, <b>bạn không cần tải file nào</b>.</div>
+    ② 每个角色选 <b>1 个</b>方案：点图片看大图，点右上角圆钮选择。带「含多视图」标签的方案，大图里有定妆照+多视图，宽图可左右滑动细看。全部选完后点底部「确认提交」。提交后 Stephen 会收到你的选择，<b>你无需下载任何文件</b>。
+    <div class="vi">② Chọn <b>1</b> phương án cho mỗi nhân vật: chạm ảnh để phóng to, chạm nút tròn góc phải để chọn. Phương án có nhãn 「Nhiều góc nhìn」mở ra sẽ thấy ảnh định trang + nhiều góc nhìn, ảnh rộng vuốt ngang để xem chi tiết. Chọn xong tất cả, bấm 「Xác nhận gửi」ở cuối trang. Stephen sẽ nhận được lựa chọn của bạn, <b>bạn không cần tải file nào</b>.</div>
   </div>
 
   <div id="content"></div>
@@ -154,7 +161,7 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
 
 <div class="lightbox" id="lb">
   <button class="x" id="lbX">✕</button>
-  <div class="lbimg"><img id="lbImg"></div>
+  <div class="lbimg" id="lbImgs"></div>
   <div class="lbcap" id="lbCap"></div>
   <div class="lbbar"><button id="lbSel"></button></div>
 </div>
@@ -230,10 +237,11 @@ function renderContent(){
       const nm=itemName(it);
       const card=document.createElement('div');
       const picked=st&&st.type==='pick'&&st.item===it.n;
-      card.className='card'+(it.w<it.h?'':' land')+(picked?' sel':'');
+      card.className='card'+(it.w>it.h?' wide':'')+(picked?' sel':'');
       card.id='card'+it.n;
       card.innerHTML='<img loading="lazy" src="'+it.file+'" alt="">'+
         '<div class="chk">✓</div>'+
+        (it.extra?'<div class="badge">含多视图 / Nhiều góc nhìn</div>':'')+
         '<div class="nm">'+esc(nm.zh)+'<span class="vi">'+esc(nm.vi)+'</span></div>';
       card.onclick=()=>openLB(g,it);
       card.querySelector('.chk').onclick=(e)=>{e.stopPropagation();pick(g,it);};
@@ -321,12 +329,21 @@ $('btnReview').onclick=openReview;
 $('btnClose').onclick=()=>$('sheet').classList.remove('open');
 $('sheet').onclick=(e)=>{if(e.target.id==='sheet')$('sheet').classList.remove('open');};
 
-/* 大图 */
+/* 大图（支持 定妆照+多视图 画廊；宽图可横滑细看） */
 function openLB(g,it){
   LB_CTX={g,it};
-  $('lbImg').src=it.file;
+  const box=$('lbImgs'); box.innerHTML='';
+  const figs=[{src:it.file,w:it.w,h:it.h,cap:it.extra?'定妆照 / Ảnh định trang':''}];
+  if(it.extra)figs.push({src:it.extra,w:it.ew,h:it.eh,cap:'多视图 / Nhiều góc nhìn'});
+  figs.forEach(f=>{
+    const wide=f.w>f.h*1.4;
+    const d=document.createElement('div');
+    d.className='lbfig'+(wide?' wide':'');
+    d.innerHTML='<div class="figwrap"><img src="'+f.src+'"></div>'+(f.cap?'<div class="figcap">'+esc(f.cap)+'</div>':'');
+    box.appendChild(d);
+  });
   const nm=itemName(it);
-  $('lbCap').innerHTML=esc(nm.zh)+'<br><span class="vi">'+esc(nm.vi)+'</span>';
+  $('lbCap').innerHTML=esc(nm.zh)+'<br><span class="vi">'+esc(nm.vi)+'</span>'+(figs.some(f=>f.w>f.h*1.4)?'<br><span class="vi" style="color:var(--acc2)">宽图可左右滑动细看 / Vuốt ngang để xem chi tiết</span>':'');
   syncLB();
   $('lb').classList.add('open');
   document.body.style.overflow='hidden';
@@ -373,7 +390,7 @@ async function submit(){
     const base={group:g.id,group_zh:g.zh,group_vi:g.vi,type:st.type};
     if(st.type==='pick'){
       const it=items.find(i=>i.n===st.item);
-      return Object.assign(base,{item:st.item,name:it?it.name:null,file:it?it.file:null});
+      return Object.assign(base,{item:st.item,name:it?it.name:null,file:it?it.file:null,extra:it&&it.extra?it.extra:null,ew:it&&it.ew?it.ew:null,eh:it&&it.eh?it.eh:null});
     }
     const it=items[0];
     return Object.assign(base,{agree:st.agree,reason:st.agree?'':(st.reason||'').trim(),name:it?it.name:null,file:it?it.file:null});

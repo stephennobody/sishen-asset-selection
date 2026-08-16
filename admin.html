@@ -249,8 +249,20 @@ async function exportPDF(p,s){
         try{
           const img=await loadImg(it.file);
           const top=yy+30, bot=PH-90;
-          x.fillStyle='#f4f4f4';x.fillRect(70,top,PW-140,bot-top);
-          drawImgFit(x,img,80,top+10,PW-160,bot-top-20);
+          if(it.extra){
+            // 定妆照+多视图：上下两区
+            const mid=top+Math.round((bot-top)*0.52);
+            x.fillStyle='#f4f4f4';x.fillRect(70,top,PW-140,mid-top-8);
+            drawImgFit(x,img,80,top+8,PW-160,mid-top-24);
+            x.font='20px sans-serif';x.fillStyle='#999';x.fillText('定妆照 / Ảnh định trang',70,top+2);
+            const img2=await loadImg(it.extra);
+            x.fillStyle='#f4f4f4';x.fillRect(70,mid+8,PW-140,bot-mid-8);
+            drawImgFit(x,img2,80,mid+16,PW-160,bot-mid-32);
+            x.font='20px sans-serif';x.fillStyle='#999';x.fillText('多视图 / Nhiều góc nhìn',70,mid+10);
+          }else{
+            x.fillStyle='#f4f4f4';x.fillRect(70,top,PW-140,bot-top);
+            drawImgFit(x,img,80,top+10,PW-160,bot-top-20);
+          }
         }catch(e){}
       }
       addPage(c);
