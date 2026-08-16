@@ -30,6 +30,151 @@
    "zh": "冥王 · 冥界统治者",
    "vi": "Minh Vương · Chúa tể Minh giới",
    "category": "char"
+  },
+  {
+   "id": "mingmu",
+   "zh": "冥母",
+   "vi": "Minh Mẫu",
+   "category": "char"
+  },
+  {
+   "id": "tianmu",
+   "zh": "天母",
+   "vi": "Thiên Mẫu",
+   "category": "char"
+  },
+  {
+   "id": "tiandi",
+   "zh": "天帝",
+   "vi": "Thiên Đế",
+   "category": "char"
+  },
+  {
+   "id": "pj01",
+   "zh": "便利店店员",
+   "vi": "Nhân viên cửa hàng tiện lợi",
+   "category": "char",
+   "divider": "其他配角 · 每个角色只需点 同意 或 不同意（写理由） / Vai phụ · chỉ cần bấm Đồng ý hoặc Không đồng ý (ghi lý do)"
+  },
+  {
+   "id": "pj02",
+   "zh": "冥将",
+   "vi": "Minh Tướng",
+   "category": "char"
+  },
+  {
+   "id": "pj03",
+   "zh": "前男友王",
+   "vi": "Vương (bạn trai cũ)",
+   "category": "char"
+  },
+  {
+   "id": "pj04",
+   "zh": "医生A",
+   "vi": "Bác sĩ A",
+   "category": "char"
+  },
+  {
+   "id": "pj05",
+   "zh": "医生B",
+   "vi": "Bác sĩ B",
+   "category": "char"
+  },
+  {
+   "id": "pj06",
+   "zh": "同事",
+   "vi": "Đồng nghiệp",
+   "category": "char"
+  },
+  {
+   "id": "pj07",
+   "zh": "天将",
+   "vi": "Thiên Tướng",
+   "category": "char"
+  },
+  {
+   "id": "pj08",
+   "zh": "安母亲",
+   "vi": "Mẹ của An",
+   "category": "char"
+  },
+  {
+   "id": "pj09",
+   "zh": "客人A",
+   "vi": "Khách A",
+   "category": "char"
+  },
+  {
+   "id": "pj10",
+   "zh": "客人B",
+   "vi": "Khách B",
+   "category": "char"
+  },
+  {
+   "id": "pj11",
+   "zh": "客人C",
+   "vi": "Khách C",
+   "category": "char"
+  },
+  {
+   "id": "pj12",
+   "zh": "彩票老人",
+   "vi": "Ông lão mua vé số",
+   "category": "char"
+  },
+  {
+   "id": "pj13",
+   "zh": "推销员",
+   "vi": "Nhân viên chào hàng",
+   "category": "char"
+  },
+  {
+   "id": "pj14",
+   "zh": "摊主",
+   "vi": "Chủ quầy",
+   "category": "char"
+  },
+  {
+   "id": "pj15",
+   "zh": "摊贩",
+   "vi": "Người bán hàng rong",
+   "category": "char"
+  },
+  {
+   "id": "pj16",
+   "zh": "摩托骑手",
+   "vi": "Tài xế mô tô",
+   "category": "char"
+  },
+  {
+   "id": "pj17",
+   "zh": "王的现任女友",
+   "vi": "Bạn gái hiện tại của Vương",
+   "category": "char"
+  },
+  {
+   "id": "pj18",
+   "zh": "算命婆婆",
+   "vi": "Bà lão bói toán",
+   "category": "char"
+  },
+  {
+   "id": "pj19",
+   "zh": "陌生死神A",
+   "vi": "Tử thần xa lạ A",
+   "category": "char"
+  },
+  {
+   "id": "pj20",
+   "zh": "陌生死神B",
+   "vi": "Tử thần xa lạ B",
+   "category": "char"
+  },
+  {
+   "id": "pj21",
+   "zh": "餐厅经理",
+   "vi": "Quản lý nhà hàng",
+   "category": "char"
   }
  ],
  "items": [
@@ -166,6 +311,303 @@
    "w": 1600,
    "h": 907,
    "group": "mingwang",
+   "category": "char"
+  },
+  {
+   "n": 18,
+   "name": "冥母-1",
+   "file": "img-18.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "mingmu",
+   "category": "char"
+  },
+  {
+   "n": 19,
+   "name": "冥母-2",
+   "file": "img-19.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "mingmu",
+   "category": "char"
+  },
+  {
+   "n": 20,
+   "name": "冥母-3",
+   "file": "img-20.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "mingmu",
+   "category": "char"
+  },
+  {
+   "n": 21,
+   "name": "天母-1",
+   "file": "img-21.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "tianmu",
+   "category": "char"
+  },
+  {
+   "n": 22,
+   "name": "天母-2",
+   "file": "img-22.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "tianmu",
+   "category": "char"
+  },
+  {
+   "n": 23,
+   "name": "天母-3",
+   "file": "img-23.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "tianmu",
+   "category": "char"
+  },
+  {
+   "n": 24,
+   "name": "天母-4",
+   "file": "img-24.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "tianmu",
+   "category": "char"
+  },
+  {
+   "n": 25,
+   "name": "天母-5",
+   "file": "img-25.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "tianmu",
+   "category": "char"
+  },
+  {
+   "n": 26,
+   "name": "天帝-1",
+   "file": "img-26.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "tiandi",
+   "category": "char"
+  },
+  {
+   "n": 27,
+   "name": "天帝-2",
+   "file": "img-27.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "tiandi",
+   "category": "char"
+  },
+  {
+   "n": 28,
+   "name": "天帝-3",
+   "file": "img-28.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "tiandi",
+   "category": "char"
+  },
+  {
+   "n": 29,
+   "name": "天帝-4",
+   "file": "img-29.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "tiandi",
+   "category": "char"
+  },
+  {
+   "n": 30,
+   "name": "便利店店员",
+   "file": "img-30.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj01",
+   "category": "char"
+  },
+  {
+   "n": 31,
+   "name": "冥将",
+   "file": "img-31.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj02",
+   "category": "char"
+  },
+  {
+   "n": 32,
+   "name": "前男友王",
+   "file": "img-32.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "pj03",
+   "category": "char"
+  },
+  {
+   "n": 33,
+   "name": "医生A",
+   "file": "img-33.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj04",
+   "category": "char"
+  },
+  {
+   "n": 34,
+   "name": "医生B",
+   "file": "img-34.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj05",
+   "category": "char"
+  },
+  {
+   "n": 35,
+   "name": "同事",
+   "file": "img-35.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj06",
+   "category": "char"
+  },
+  {
+   "n": 36,
+   "name": "天将",
+   "file": "img-36.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj07",
+   "category": "char"
+  },
+  {
+   "n": 37,
+   "name": "安母亲",
+   "file": "img-37.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj08",
+   "category": "char"
+  },
+  {
+   "n": 38,
+   "name": "客人A",
+   "file": "img-38.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj09",
+   "category": "char"
+  },
+  {
+   "n": 39,
+   "name": "客人B",
+   "file": "img-39.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj10",
+   "category": "char"
+  },
+  {
+   "n": 40,
+   "name": "客人C",
+   "file": "img-40.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj11",
+   "category": "char"
+  },
+  {
+   "n": 41,
+   "name": "彩票老人",
+   "file": "img-41.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj12",
+   "category": "char"
+  },
+  {
+   "n": 42,
+   "name": "推销员",
+   "file": "img-42.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj13",
+   "category": "char"
+  },
+  {
+   "n": 43,
+   "name": "摊主",
+   "file": "img-43.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj14",
+   "category": "char"
+  },
+  {
+   "n": 44,
+   "name": "摊贩",
+   "file": "img-44.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj15",
+   "category": "char"
+  },
+  {
+   "n": 45,
+   "name": "摩托骑手",
+   "file": "img-45.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj16",
+   "category": "char"
+  },
+  {
+   "n": 46,
+   "name": "王的现任女友",
+   "file": "img-46.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj17",
+   "category": "char"
+  },
+  {
+   "n": 47,
+   "name": "算命婆婆",
+   "file": "img-47.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj18",
+   "category": "char"
+  },
+  {
+   "n": 48,
+   "name": "陌生死神A",
+   "file": "img-48.jpg",
+   "w": 1600,
+   "h": 900,
+   "group": "pj19",
+   "category": "char"
+  },
+  {
+   "n": 49,
+   "name": "陌生死神B",
+   "file": "img-49.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj20",
+   "category": "char"
+  },
+  {
+   "n": 50,
+   "name": "餐厅经理",
+   "file": "img-50.jpg",
+   "w": 1600,
+   "h": 906,
+   "group": "pj21",
    "category": "char"
   }
  ]

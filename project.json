@@ -1,8 +1,8 @@
 {
  "title_zh": "死神之吻 · 人物资产选择",
  "title_vi": "Nụ Hôn Tử Thần · Lựa chọn nhân vật",
- "subtitle_zh": "为每个角色选 1 个方案 → 点「确认提交」即可，无需下载任何文件",
- "subtitle_vi": "Chọn 1 phương án cho mỗi nhân vật → bấm 「Xác nhận gửi」là xong, không cần tải file",
+ "subtitle_zh": "主角每个角色选 1 个方案，配角逐个确认同意/不同意 → 点「确认提交」即可，无需下载",
+ "subtitle_vi": "Chọn 1 phương án cho mỗi nhân vật chính, xác nhận đồng ý/không đồng ý cho vai phụ → bấm 「Xác nhận gửi」là xong, không cần tải file",
  "choosers": [
   {
    "zh": "Dennis 先生",

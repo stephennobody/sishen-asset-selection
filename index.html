@@ -36,6 +36,7 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
 .group h2 .vi{display:block;font-size:13px;color:var(--sub);font-weight:400}
 .group .meta{font-size:11.5px;color:var(--sub);margin:2px 0 10px}
 .group .meta .done{color:var(--ok);font-weight:700}
+.divider{margin:26px 0 4px;font-size:14.5px;font-weight:700;color:var(--acc2);border-top:1px solid var(--line);padding-top:18px;line-height:1.6}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .card{background:var(--card);border:2px solid var(--line);border-radius:12px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .15s}
 .card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#000}
@@ -134,8 +135,8 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
   </div>
 
   <div class="guide">
-    ② 每个角色选 <b>1 个</b>方案：点图片看大图，点右上角圆钮选择。带「含多视图」标签的方案，大图里有定妆照+多视图，宽图可左右滑动细看。全部选完后点底部「确认提交」。提交后 Stephen 会收到你的选择，<b>你无需下载任何文件</b>。
-    <div class="vi">② Chọn <b>1</b> phương án cho mỗi nhân vật: chạm ảnh để phóng to, chạm nút tròn góc phải để chọn. Phương án có nhãn 「Nhiều góc nhìn」mở ra sẽ thấy ảnh định trang + nhiều góc nhìn, ảnh rộng vuốt ngang để xem chi tiết. Chọn xong tất cả, bấm 「Xác nhận gửi」ở cuối trang. Stephen sẽ nhận được lựa chọn của bạn, <b>bạn không cần tải file nào</b>.</div>
+    ② 主角每个角色选 <b>1 个</b>方案：点图片看大图，点右上角圆钮选择。带「含多视图」标签的方案，大图里有定妆照+多视图，宽图可左右滑动细看。下方「其他配角」每个角色只需点<b>同意</b>或<b>不同意（需写理由）</b>。全部完成后点底部「确认提交」。提交后 Stephen 会收到你的选择，<b>你无需下载任何文件</b>。
+    <div class="vi">② Với nhân vật chính, chọn <b>1</b> phương án cho mỗi nhân vật: chạm ảnh để phóng to, chạm nút tròn góc phải để chọn. Phương án có nhãn 「Nhiều góc nhìn」mở ra sẽ thấy ảnh định trang + nhiều góc nhìn, ảnh rộng vuốt ngang để xem chi tiết. Phần 「Vai phụ」bên dưới, mỗi nhân vật chỉ cần bấm <b>Đồng ý</b> hoặc <b>Không đồng ý (ghi rõ lý do)</b>. Hoàn tất tất cả, bấm 「Xác nhận gửi」ở cuối trang. Stephen sẽ nhận được lựa chọn của bạn, <b>bạn không cần tải file nào</b>.</div>
   </div>
 
   <div id="content"></div>
@@ -222,16 +223,21 @@ function renderWho(){
   });
 }
 
+function metaBase(items){return items.length===1?'仅此 1 个形象，请确认 / Chỉ 1 hình tượng, vui lòng xác nhận':'共 '+items.length+' 个方案 / '+items.length+' phương án';}
+function stHtml(g){return SEL[g.id]?'<span class="done">✓ 已选 / Đã chọn</span>':'未选 / Chưa chọn';}
+
 function renderContent(){
   const c=$('content'); c.innerHTML='';
   M.groups.forEach(g=>{
     const items=groupItems(g.id);
     if(!items.length)return;
+    if(g.divider){
+      const dv=document.createElement('div'); dv.className='divider'; dv.textContent=g.divider; c.appendChild(dv);
+    }
     const sec=document.createElement('div'); sec.className='group'; sec.id='grp_'+g.id;
     const st=SEL[g.id];
-    const stTxt=st?'<span class="done">✓ 已选 / Đã chọn</span>':'未选 / Chưa chọn';
     sec.innerHTML='<h2>'+esc(g.zh)+'<span class="vi">'+esc(g.vi)+'</span></h2>'+
-      '<div class="meta" id="meta_'+g.id+'">共 '+items.length+' 个方案 / '+items.length+' phương án · '+stTxt+'</div>';
+      '<div class="meta" id="meta_'+g.id+'">'+metaBase(items)+' · '+stHtml(g)+'</div>';
     const grid=document.createElement('div'); grid.className='grid';
     items.forEach(it=>{
       const nm=itemName(it);
@@ -280,7 +286,15 @@ function pick(g,it){
 function vote(g,agree){
   const prev=SEL[g.id];
   SEL[g.id]={type:'vote',agree,reason:(prev&&prev.reason)||''};
-  save(); renderContent(); refreshCounts();
+  save();
+  const agreed=agree===true;
+  const yb=$('vy_'+g.id), nb=$('vn_'+g.id), rs=$('rs_'+g.id);
+  if(yb)yb.classList.toggle('on',agreed);
+  if(nb)nb.classList.toggle('on',!agreed);
+  if(rs)rs.classList.toggle('show',!agreed);
+  const meta=$('meta_'+g.id);
+  if(meta)meta.innerHTML=metaBase(groupItems(g.id))+' · '+stHtml(g);
+  refreshCounts();
 }
 function refreshGroup(g){
   const items=groupItems(g.id);
@@ -291,8 +305,7 @@ function refreshGroup(g){
   });
   const meta=$('meta_'+g.id);
   if(meta){
-    const base='共 '+items.length+' 个方案 / '+items.length+' phương án · ';
-    meta.innerHTML=base+(st?'<span class="done">✓ 已选 / Đã chọn</span>':'未选 / Chưa chọn');
+    meta.innerHTML=metaBase(items)+' · '+stHtml(g);
   }
 }
 function refreshCounts(){
