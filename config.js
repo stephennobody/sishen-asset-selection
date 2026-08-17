@@ -23,5 +23,14 @@ const PROJECTS = [
     url: 'https://stephennobody.github.io/meirenji-asset-selection/',
     backend: false,           // 选择人自行导出 PDF，无后台数据
     note: '选择人自行导出 PDF 发微信群，后台无数据'
+  },
+  {
+    id: 'meirenji_r2',
+    zh: '美人计 · 男性角色面部方案（第二轮）',
+    vi: 'Mỹ Nhân Kế · Vòng 2',
+    url: 'https://stephennobody.github.io/meirenji-face-r2/',
+    backend: true,
+    manifest: 'manifest.json',
+    projectJson: 'project.json'
   }
 ];
