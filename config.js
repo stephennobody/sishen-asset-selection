@@ -32,5 +32,23 @@ const PROJECTS = [
     backend: true,
     manifest: 'manifest.json',
     projectJson: 'project.json'
+  },
+  {
+    id: 'wenshen',
+    zh: '纹身之神 · 人物资产选择',
+    vi: 'Thần Hình Xăm',
+    url: 'https://stephennobody.github.io/wenshen-asset-selection/',
+    backend: true,
+    manifest: 'manifest.json',
+    projectJson: 'project.json'
+  },
+  {
+    id: 'lottery330',
+    zh: '330亿彩票 · 人物资产选择',
+    vi: 'Vé Số 33 Tỷ',
+    url: 'https://stephennobody.github.io/lottery330-asset-selection/',
+    backend: true,
+    manifest: 'manifest.json',
+    projectJson: 'project.json'
   }
 ];
