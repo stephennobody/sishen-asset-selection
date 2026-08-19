@@ -50,5 +50,14 @@ const PROJECTS = [
     backend: true,
     manifest: 'manifest.json',
     projectJson: 'project.json'
+  },
+  {
+    id: 'shenpan',
+    zh: '审判游戏 · 人物资产选择',
+    vi: 'Trò Chơi Phán Xét',
+    url: 'https://stephennobody.github.io/shenpan-asset-selection/',
+    backend: true,
+    manifest: 'manifest.json',
+    projectJson: 'project.json'
   }
 ];
