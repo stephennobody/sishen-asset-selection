@@ -39,9 +39,10 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
 .divider{margin:26px 0 4px;font-size:14.5px;font-weight:700;color:var(--acc2);border-top:1px solid var(--line);padding-top:18px;line-height:1.6}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .card{background:var(--card);border:2px solid var(--line);border-radius:12px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .15s}
-.card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#000}
+.card img{width:100%;aspect-ratio:3/4;object-fit:contain;display:block;background:#000}
 .card.wide{grid-column:1/-1}
 .card.wide img{aspect-ratio:auto;object-fit:contain;background:#111}
+.card.sel .nm{background:rgba(232,182,76,.14)}
 .card .badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.65);border-radius:6px;padding:3px 8px;font-size:10.5px;color:var(--acc2);z-index:2}
 .card .nm{padding:8px 9px 9px;font-size:12.5px;line-height:1.35}
 .card .nm .vi{display:block;font-size:11px;color:var(--sub)}
@@ -118,7 +119,26 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
 .prog .box{background:var(--card);border-radius:14px;padding:22px 26px;text-align:center;max-width:80%;font-size:14px}
 .prog .box .vi{color:var(--sub);font-size:12px}
 .toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);background:#000d;border:1px solid var(--line);padding:10px 16px;border-radius:10px;font-size:13px;z-index:90;display:none;max-width:86%;text-align:center}
-@media(min-width:560px){.grid{grid-template-columns:1fr 1fr 1fr}}
+/* 大图翻页 */
+.lbnav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;border:none;font-size:24px;z-index:3}
+.lbnav.prev{left:8px}.lbnav.next{right:8px}
+.lbpos{position:absolute;top:calc(12px + env(safe-area-inset-top));left:14px;background:rgba(0,0,0,.55);border-radius:8px;padding:4px 10px;font-size:12px;color:#fff;z-index:3}
+/* 截图一览 */
+.shot{position:fixed;inset:0;z-index:95;background:var(--bg);display:none;overflow-y:auto}
+.shot.open{display:block}
+.shot .inner{max-width:720px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 10px 80px}
+.shot h3{font-size:16px;text-align:center;line-height:1.4}
+.shot .sh-sub{text-align:center;font-size:11.5px;color:var(--sub);margin:3px 0 12px;line-height:1.5}
+.shotgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.shotcell{background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.shotcell img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#000;display:block}
+.shotcell .noimg{width:100%;aspect-ratio:1/1;background:var(--card2);display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:20px}
+.shotcell .t{font-size:10px;padding:4px 4px 5px;line-height:1.35;text-align:center}
+.shotcell .t b{color:var(--acc2)}
+.shotcell.miss .t{color:var(--no)}
+.shot .x2{position:fixed;top:calc(8px + env(safe-area-inset-top));right:12px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;border:none;font-size:18px;z-index:2}
+.shot .tip{position:fixed;left:0;right:0;bottom:0;text-align:center;font-size:11.5px;color:var(--sub);background:rgba(15,17,21,.96);padding:9px 10px calc(9px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+@media(min-width:560px){.grid{grid-template-columns:1fr 1fr 1fr}.shotgrid{grid-template-columns:repeat(5,1fr)}}
 </style>
 </head>
 <body>
@@ -186,14 +206,18 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
     <div class="hd">我的选择 <span id="cntB">0/0</span><span class="vi">Lựa chọn của tôi</span></div>
     <div class="list" id="selList"></div>
     <div class="ft">
-      <button id="btnClose">返回 / Quay lại</button>
-      <button class="primary" id="btnSubmit2">确认提交 / Xác nhận gửi</button>
+      <button id="btnClose">返回<br>Quay lại</button>
+      <button id="btnShot">截图一览<br>Chụp màn hình</button>
+      <button class="primary" id="btnSubmit2">确认提交<br>Xác nhận gửi</button>
     </div>
   </div>
 </div>
 
 <div class="lightbox" id="lb">
   <button class="x" id="lbX">✕</button>
+  <div class="lbpos" id="lbPos"></div>
+  <button class="lbnav prev" id="lbPrev">‹</button>
+  <button class="lbnav next" id="lbNext">›</button>
   <div class="lbimg" id="lbImgs"></div>
   <div class="lbcap" id="lbCap"></div>
   <div class="lbbar"><button id="lbSel"></button></div>
@@ -208,7 +232,18 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
   <h2>提交成功</h2>
   <div class="vi">Gửi thành công</div>
   <p id="doneMsg">Stephen 已收到你的选择结果，<b>你无需下载或转发任何文件</b>。<br><span class="vi">Stephen đã nhận được kết quả của bạn, <b>bạn không cần tải hay chuyển tiếp file nào</b>.</span></p>
-  <button id="btnAgain">修改并重新提交 / Chỉnh sửa và gửi lại</button>
+  <button id="btnDoneShot" style="margin-top:22px">查看我的选择（可截图）/ Xem lựa chọn (chụp màn hình)</button>
+  <button id="btnAgain" style="margin-top:12px">修改并重新提交 / Chỉnh sửa và gửi lại</button>
+</div>
+
+<div class="shot" id="shot">
+  <button class="x2" id="shotX">✕</button>
+  <div class="inner">
+    <h3 id="shotTitle"></h3>
+    <div class="sh-sub" id="shotSub"></div>
+    <div class="shotgrid" id="shotGrid"></div>
+  </div>
+  <div class="tip">截屏此页即可发给 Stephen / Chụp màn hình trang này để gửi cho Stephen</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -277,7 +312,7 @@ function renderContent(){
       const picked=st&&st.type==='pick'&&st.item===it.n;
       card.className='card'+(it.w>it.h?' wide':'')+(picked?' sel':'');
       card.id='card'+it.n;
-      card.innerHTML='<img loading="lazy" src="'+it.file+'" alt="">'+
+      card.innerHTML='<img loading="lazy" decoding="async" src="'+(it.thumb||it.file)+'" alt="">'+
         '<div class="chk">✓</div>'+
         (it.extra?'<div class="badge">'+esc(it.badge||'含多视图 / Nhiều góc nhìn')+'</div>':'')+
         '<div class="nm">'+esc(nm.zh)+'<span class="vi">'+esc(nm.vi)+'</span></div>';
@@ -358,11 +393,11 @@ function openReview(){
     }else if(st.type==='pick'){
       const it=items.find(i=>i.n===st.item);
       const nm=itemName(it);
-      row.innerHTML='<img src="'+it.file+'"><div class="t">'+esc(nm.zh)+'<span class="vi">'+esc(nm.vi)+'</span></div><button>取消<br>Bỏ chọn</button>';
+      row.innerHTML='<img src="'+(it.thumb||it.file)+'"><div class="t">'+esc(nm.zh)+'<span class="vi">'+esc(nm.vi)+'</span></div><button>取消<br>Bỏ chọn</button>';
       row.querySelector('button').onclick=()=>{delete SEL[g.id];save();refreshGroup(g);refreshCounts();openReview();};
     }else{
       const it=items[0];
-      row.innerHTML='<img src="'+it.file+'"><div class="t">'+(st.agree?'✓ 同意 ':'✗ 不同意 ')+esc(g.zh)+
+      row.innerHTML='<img src="'+(it.thumb||it.file)+'"><div class="t">'+(st.agree?'✓ 同意 ':'✗ 不同意 ')+esc(g.zh)+
         '<span class="vi">'+(st.agree?'Đồng ý ':'Không đồng ý ')+esc(g.vi)+'</span>'+
         (!st.agree&&st.reason?'<span class="rsn">理由 / Lý do: '+esc(st.reason)+'</span>':'')+'</div>';
     }
@@ -373,6 +408,40 @@ function openReview(){
 $('btnReview').onclick=openReview;
 $('btnClose').onclick=()=>$('sheet').classList.remove('open');
 $('sheet').onclick=(e)=>{if(e.target.id==='sheet')$('sheet').classList.remove('open');};
+
+/* 截图一览：紧凑宫格，方便一页截屏分享 */
+function openShot(){
+  const who=WHO!==null?P.choosers[WHO]:null;
+  $('shotTitle').textContent=P.title_zh+' · 我的选择';
+  const now=new Date();
+  $('shotSub').textContent=(who?who.zh+' / '+who.vi:'未选身份 / Chưa chọn')+' · '+doneCount()+'/'+totalGroups()+' · '+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  const grid=$('shotGrid'); grid.innerHTML='';
+  M.groups.forEach(g=>{
+    const items=groupItems(g.id);
+    if(!items.length)return;
+    const st=SEL[g.id];
+    const cell=document.createElement('div');
+    cell.className='shotcell'+(st?'':' miss');
+    if(!st){
+      cell.innerHTML='<div class="noimg">?</div><div class="t">'+esc(g.zh)+'<br>未选 / Chưa chọn</div>';
+    }else if(st.type==='pick'){
+      const it=items.find(i=>i.n===st.item);
+      const m=it.name.match(/-(\d+)$/);
+      cell.innerHTML='<img loading="lazy" src="'+(it.thumb||it.file)+'"><div class="t">'+esc(g.zh)+'<br><b>'+(m?'方案'+m[1]+' / PA '+m[1]:esc(it.name))+'</b></div>';
+    }else{
+      const it=items[0];
+      cell.innerHTML='<img loading="lazy" src="'+(it.thumb||it.file)+'"><div class="t">'+esc(g.zh)+'<br><b>'+(st.agree?'✓ 同意 / Đồng ý':'✗ 不同意 / K.đồng ý')+'</b></div>';
+    }
+    grid.appendChild(cell);
+  });
+  $('shot').classList.add('open');
+  $('shot').scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+function closeShot(){$('shot').classList.remove('open');if(!$('done').classList.contains('open'))document.body.style.overflow='';}
+$('btnShot').onclick=()=>{$('sheet').classList.remove('open');openShot();};
+$('btnDoneShot').onclick=openShot;
+$('shotX').onclick=closeShot;
 
 /* 大图（支持 定妆照+多视图 画廊；宽图可横滑细看） */
 function openLB(g,it){
@@ -389,10 +458,24 @@ function openLB(g,it){
   });
   const nm=itemName(it);
   $('lbCap').innerHTML=esc(nm.zh)+'<br><span class="vi">'+esc(nm.vi)+'</span>'+(figs.some(f=>f.w>f.h*1.4)?'<br><span class="vi" style="color:var(--acc2)">宽图可左右滑动细看 / Vuốt ngang để xem chi tiết</span>':'');
+  const items=groupItems(g.id), idx=items.indexOf(it);
+  $('lbPos').textContent=(idx+1)+' / '+items.length;
+  const multi=items.length>1;
+  $('lbPrev').style.display=$('lbNext').style.display=multi?'block':'none';
+  $('lbPos').style.display=multi?'block':'none';
   syncLB();
   $('lb').classList.add('open');
   document.body.style.overflow='hidden';
 }
+function lbNav(d){
+  if(!LB_CTX)return;
+  const items=groupItems(LB_CTX.g.id);
+  if(items.length<2)return;
+  const i=items.indexOf(LB_CTX.it);
+  openLB(LB_CTX.g, items[(i+d+items.length)%items.length]);
+}
+$('lbPrev').onclick=()=>lbNav(-1);
+$('lbNext').onclick=()=>lbNav(1);
 function syncLB(){
   if(!LB_CTX)return;
   const st=SEL[LB_CTX.g.id];
