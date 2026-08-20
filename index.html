@@ -187,8 +187,8 @@ header.top .spec{font-size:11.5px;color:var(--sub);margin-top:6px;opacity:.85;li
   </div>
 
   <div class="guide">
-    ② 主角每个角色选 <b>1 个</b>方案：卡片直接显示完整多视图表，点图片看大图（带「含定妆照」标签的方案还能看到定妆照），宽图可左右滑动细看。点右上角圆钮选择。下方「其他配角」每个角色只需点<b>同意</b>或<b>不同意（需写理由）</b>。全部完成后点底部「确认提交」。提交后 Stephen 会收到你的选择，<b>你无需下载任何文件</b>。
-    <div class="vi">② Với nhân vật chính, chọn <b>1</b> phương án cho mỗi nhân vật: thẻ hiển thị sẵn bảng nhiều góc nhìn, chạm ảnh để phóng to (phương án có nhãn 「Có ảnh định trang」xem thêm được ảnh định trang), ảnh rộng vuốt ngang để xem chi tiết. Chạm nút tròn góc phải để chọn. Phần 「Vai phụ」bên dưới, mỗi nhân vật chỉ cần bấm <b>Đồng ý</b> hoặc <b>Không đồng ý (ghi rõ lý do)</b>. Hoàn tất tất cả, bấm 「Xác nhận gửi」ở cuối trang. Stephen sẽ nhận được lựa chọn của bạn, <b>bạn không cần tải file nào</b>.</div>
+    ② 主角每个角色选 <b>1 个</b>方案：卡片直接显示完整多视图表，点图片看大图（带「含定妆照」标签的方案还能看到定妆照），宽图可左右滑动细看。点右上角圆钮选择。下方「其他配角」每个角色只需点<b>同意</b>或<b>不同意（需写理由）</b>。选好你要选的即可点底部「确认提交」，<b>不必全部选完</b>。提交后 Stephen 会收到你的选择，<b>你无需下载任何文件</b>。
+    <div class="vi">② Với nhân vật chính, chọn <b>1</b> phương án cho mỗi nhân vật: thẻ hiển thị sẵn bảng nhiều góc nhìn, chạm ảnh để phóng to (phương án có nhãn 「Có ảnh định trang」xem thêm được ảnh định trang), ảnh rộng vuốt ngang để xem chi tiết. Chạm nút tròn góc phải để chọn. Phần 「Vai phụ」bên dưới, mỗi nhân vật chỉ cần bấm <b>Đồng ý</b> hoặc <b>Không đồng ý (ghi rõ lý do)</b>. Chọn xong những mục bạn muốn, bấm 「Xác nhận gửi」ở cuối trang, <b>không cần chọn hết tất cả</b>. Stephen sẽ nhận được lựa chọn của bạn, <b>bạn không cần tải file nào</b>.</div>
   </div>
 
   <div id="content"></div>
@@ -489,21 +489,26 @@ $('lbX').onclick=()=>{$('lb').classList.remove('open');document.body.style.overf
 /* ===== 提交 ===== */
 function validate(){
   if(WHO===null){toast('请先在页面顶部选择您的身份 / Vui lòng chọn bạn là ai ở đầu trang');window.scrollTo(0,0);return false;}
+  let missingReason=null;
   for(const g of M.groups){
     const items=groupItems(g.id);
     if(!items.length)continue;
     const st=SEL[g.id];
-    if(!st){
-      toast('还有角色未选择：'+g.zh+' / Còn nhân vật chưa chọn: '+g.vi);
-      const el=$('grp_'+g.id); if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
-      return false;
-    }
-    if(st.type==='vote'&&st.agree===false&&!(st.reason||'').trim()){
+    if(st&&st.type==='vote'&&st.agree===false&&!(st.reason||'').trim()){
+      missingReason=g;
       const rq=$('rq_'+g.id); if(rq)rq.style.display='block';
-      const rt=$('rt_'+g.id); if(rt)rt.focus();
-      toast('请写明不同意的理由 / Vui lòng ghi rõ lý do không đồng ý');
-      return false;
+      break;
     }
+  }
+  if(missingReason){
+    const rt=$('rt_'+missingReason.id); if(rt)rt.focus();
+    toast('请写明不同意的理由 / Vui lòng ghi rõ lý do không đồng ý');
+    return false;
+  }
+  const d=doneCount(), t=totalGroups();
+  if(d===0){toast('还没有任何选择，请先选择 / Bạn chưa chọn mục nào');return false;}
+  if(d<t){
+    return confirm('还有 '+(t-d)+' 项未选择，确定只提交已选的 '+d+' 项吗？\n（未选的项之后可以再次打开页面补充提交）\n\nCòn '+(t-d)+' mục chưa chọn, xác nhận chỉ gửi '+d+' mục đã chọn?\n(Các mục chưa chọn có thể mở lại trang để bổ sung sau)');
   }
   return true;
 }
