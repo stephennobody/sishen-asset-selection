@@ -69,6 +69,24 @@ h1{font-size:20px;text-align:center;padding:8px 0 2px}
 .verrow .vt{flex:1;color:var(--sub)}
 .verrow button{border-radius:8px;padding:6px 10px;font-size:12px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer}
 .verToggle{width:100%;margin-top:10px;border-radius:10px;padding:9px;font-size:12.5px;border:1px dashed var(--line);background:none;color:var(--sub);cursor:pointer}
+/* 时间轴 */
+.tl{margin:16px 0 0 8px;border-left:2px solid var(--line)}
+.tlitem{position:relative;padding:0 0 16px 20px}
+.tlitem::before{content:"";position:absolute;left:-8px;top:8px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2.5px solid var(--sub)}
+.tlitem.hot::before{background:var(--acc);border-color:var(--acc)}
+.tlcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.tlcard .tt{font-size:13px;font-weight:700}
+.tlcard .tt .t-time{color:var(--acc2);margin-right:8px}
+.tlcard .tt .t-who{color:var(--txt)}
+.tlcard .t-meta{font-size:11.5px;color:var(--sub);margin-top:2px}
+.tlcard .t-choices{display:none;margin-top:8px}
+.tlcard .t-choices.open{display:block}
+.tlcard .acts{display:flex;gap:8px;margin-top:10px}
+.tlcard .acts button{flex:1;border-radius:9px;padding:8px;font-size:12.5px;border:1.5px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer}
+.tlcard .acts button.primary{background:var(--acc);border-color:var(--acc);color:#111;font-weight:700}
+.fchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.fchips .chip{cursor:pointer;background:none}
+.fchips .chip.on{border-color:var(--acc);color:var(--acc2);background:rgba(232,182,76,.1)}
 .toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);background:#000d;border:1px solid var(--line);padding:10px 16px;border-radius:10px;font-size:13px;z-index:90;display:none;max-width:86%;text-align:center}
 .prog{position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center}
 .prog.open{display:flex}
@@ -164,8 +182,8 @@ async function renderProjects(){
   }
 }
 
-/* ===== 项目详情：按选择人分组 + 自动版本管理 ===== */
-let CUR_P=null;
+/* ===== 项目详情：时间轴版本管理 ===== */
+let CUR_P=null, CUR_FILTER=null;
 function choiceRows(p,ch){
   let rows='';
   ch.forEach(c=>{
@@ -182,7 +200,7 @@ function choiceRows(p,ch){
   return rows;
 }
 async function renderDetail(p){
-  CUR_P=p;
+  CUR_P=p; CUR_FILTER=null;
   $('pjList').style.display='none';
   const d=$('detail'); d.innerHTML='';
   const subs=window['_subs_'+p.id]||await fetchSubs(p.id);
@@ -193,50 +211,66 @@ async function renderDetail(p){
   }
   const t=document.createElement('div');
   t.innerHTML='<a class="back" id="btnBack">← 返回项目列表</a>'+
-    '<div class="secT">'+esc(p.zh)+' · 共 '+subs.length+' 次提交</div>';
+    '<div class="secT">'+esc(p.zh)+' · 共 '+subs.length+' 次提交</div>'+
+    '<div class="fchips" id="fchips"></div>'+
+    '<div class="tl" id="tl"></div>';
   d.appendChild(t);
   t.querySelector('#btnBack').onclick=()=>{$('detail').innerHTML='';$('pjList').style.display='';renderProjects();window.scrollTo(0,0);};
   if(!subs.length){
-    const e=document.createElement('div');e.className='sub2';e.textContent='还没有人提交。';d.appendChild(e);
+    $('tl').innerHTML='<div class="sub2">还没有人提交。</div>';
     return;
   }
-  // 按选择人分组，组内按时间升序编号版本 v1、v2…（最早的=v1，最新=最大号）
+  // 每个选择人的版本号：按其提交时间升序编号 v1、v2…（最早=v1）
   const bySel={};
   subs.forEach(s=>{(bySel[s.selector]=bySel[s.selector]||[]).push(s);});
-  Object.values(bySel).forEach(arr=>arr.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)));
-  const sels=Object.keys(bySel).sort((a,b)=>new Date(bySel[b][bySel[b].length-1].created_at)-new Date(bySel[a][bySel[a].length-1].created_at));
-  sels.forEach(sel=>{
-    const arr=bySel[sel];           // 升序：arr[0]=v1 … arr[last]=最新版
-    const latestIdx=arr.length-1;
-    const div=document.createElement('div'); div.className='selcard';
-    const latest=arr[latestIdx];
-    div.innerHTML='<div class="hd"><span class="who">'+esc(sel)+'<span class="ver-tag">v'+(latestIdx+1)+' 最新</span></span>'+
-      '<span class="vcount">共 '+arr.length+' 个版本</span></div>'+
-      '<div class="time2">最新提交：'+fmtTime(new Date(latest.created_at))+'</div>'+
-      '<div class="items">'+choiceRows(p,(latest.data&&latest.data.choices)||[])+'</div>'+
-      '<div class="acts"><button class="primary pdf">下载最新版 PDF (v'+(latestIdx+1)+')</button><button class="del">删除此版本</button></div>';
-    div.querySelector('.pdf').onclick=()=>exportPDF(p,latest,latestIdx+1);
-    div.querySelector('.del').onclick=()=>delSub(p,latest);
-    // 历史版本
-    if(arr.length>1){
-      const tg=document.createElement('button'); tg.className='verToggle';
-      tg.textContent='查看历史版本（v1 – v'+latestIdx+'，共 '+latestIdx+' 个）▾';
-      const vl=document.createElement('div'); vl.className='verlist'; vl.style.display='none';
-      for(let i=latestIdx-1;i>=0;i--){
-        const s=arr[i], v=i+1;
-        const row=document.createElement('div'); row.className='verrow';
-        row.innerHTML='<span class="ver-tag old">v'+v+'</span><span class="vt">'+fmtTime(new Date(s.created_at))+'</span>'+
-          '<button class="vpdf">PDF</button><button class="vdel">删除</button>';
-        row.querySelector('.vpdf').onclick=()=>exportPDF(p,s,v);
-        row.querySelector('.vdel').onclick=()=>delSub(p,s);
-        vl.appendChild(row);
-      }
-      tg.onclick=()=>{const open=vl.style.display!=='none';vl.style.display=open?'none':'block';tg.textContent=(open?'查看历史版本（v1 – v'+latestIdx+'，共 '+latestIdx+' 个）▾':'收起历史版本 ▴');};
-      div.appendChild(tg); div.appendChild(vl);
-    }
-    d.appendChild(div);
+  const verOf={};
+  Object.entries(bySel).forEach(([sel,arr])=>{
+    arr.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+    arr.forEach((s,i)=>{verOf[s.id]={v:i+1,latest:i===arr.length-1,total:arr.length};});
   });
+  // 筛选 chips：全部 + 各选择人
+  const fc=$('fchips');
+  function renderFilterChips(p,subs){
+    fc.innerHTML='';
+    const all=document.createElement('span'); all.className='chip'+(CUR_FILTER===null?' on':''); all.textContent='全部（'+subs.length+'）';
+    all.onclick=()=>{CUR_FILTER=null;renderTimeline(p,subs,verOf);renderFilterChips(p,subs);};
+    fc.appendChild(all);
+    Object.keys(bySel).forEach(sel=>{
+      const c=document.createElement('span'); c.className='chip'+(CUR_FILTER===sel?' on':''); c.textContent=sel.split(' / ')[0]+'（'+bySel[sel].length+'）';
+      c.onclick=()=>{CUR_FILTER=sel;renderTimeline(p,subs,verOf);renderFilterChips(p,subs);};
+      fc.appendChild(c);
+    });
+  }
+  renderFilterChips(p,subs);
+  renderTimeline(p,subs,verOf);
   window.scrollTo(0,0);
+}
+function renderTimeline(p,subs,verOf){
+  const tl=$('tl'); tl.innerHTML='';
+  const list=subs.filter(s=>CUR_FILTER===null||s.selector===CUR_FILTER).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)); // 最新在上
+  if(!list.length){tl.innerHTML='<div class="sub2">此选择人暂无提交。</div>';return;}
+  list.forEach((s,idx)=>{
+    const vi=verOf[s.id];
+    const ch=(s.data&&s.data.choices)||[];
+    const item=document.createElement('div'); item.className='tlitem'+(idx===0&&CUR_FILTER===null?' hot':'');
+    const tagCls=vi.latest?'ver-tag':'ver-tag old';
+    const tagTxt='v'+vi.v+(vi.latest?' 最新':'');
+    item.innerHTML='<div class="tlcard">'+
+      '<div class="tt"><span class="t-time">'+fmtTime(new Date(s.created_at))+'</span></div>'+
+      '<div class="tt" style="margin-top:2px"><span class="t-who">'+esc(s.selector)+'</span><span class="'+tagCls+'">'+tagTxt+'</span></div>'+
+      '<div class="t-meta">'+ch.length+' 项选择 · 此人的第 '+vi.v+'/'+vi.total+' 版</div>'+
+      '<div class="t-choices">'+choiceRows(p,ch)+'</div>'+
+      '<div class="acts">'+
+        '<button class="expand">展开明细</button>'+
+        '<button class="primary pdf">下载 PDF (v'+vi.v+')</button>'+
+        '<button class="del">删除</button>'+
+      '</div></div>';
+    const exp=item.querySelector('.expand'), box=item.querySelector('.t-choices');
+    exp.onclick=()=>{const o=box.classList.toggle('open');exp.textContent=o?'收起明细':'展开明细';};
+    item.querySelector('.pdf').onclick=()=>exportPDF(p,s,vi.v);
+    item.querySelector('.del').onclick=()=>delSub(p,s);
+    tl.appendChild(item);
+  });
 }
 
 /* 时间：精确到秒 + 相对提示 */
