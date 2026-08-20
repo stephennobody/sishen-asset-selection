@@ -54,7 +54,21 @@ h1{font-size:20px;text-align:center;padding:8px 0 2px}
 .sub2 .acts button{flex:1;border-radius:10px;padding:11px;font-size:13.5px;border:1.5px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer}
 .sub2 .acts button.primary{background:var(--acc);border-color:var(--acc);color:#111;font-weight:700}
 .secT{font-size:15px;font-weight:700;margin:22px 0 4px;color:var(--acc2)}
-.back{color:var(--sub);font-size:13px;text-decoration:none}
+.back{color:var(--sub);font-size:13px;text-decoration:none;cursor:pointer;display:inline-block;margin-top:14px;padding:8px 12px;border:1px solid var(--line);border-radius:10px}
+.back:active{background:var(--card2)}
+/* 版本管理 */
+.selcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.selcard .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.selcard .who{font-size:15px;font-weight:700}
+.selcard .vcount{font-size:12px;color:var(--sub)}
+.ver-tag{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;background:rgba(232,182,76,.16);color:var(--acc2);margin-left:8px}
+.ver-tag.old{background:rgba(154,161,173,.14);color:var(--sub)}
+.verlist{margin-top:10px;border-top:1px dashed var(--line);padding-top:6px}
+.verrow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.verrow:last-child{border-bottom:none}
+.verrow .vt{flex:1;color:var(--sub)}
+.verrow button{border-radius:8px;padding:6px 10px;font-size:12px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer}
+.verToggle{width:100%;margin-top:10px;border-radius:10px;padding:9px;font-size:12.5px;border:1px dashed var(--line);background:none;color:var(--sub);cursor:pointer}
 .toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);background:#000d;border:1px solid var(--line);padding:10px 16px;border-radius:10px;font-size:13px;z-index:90;display:none;max-width:86%;text-align:center}
 .prog{position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center}
 .prog.open{display:flex}
@@ -150,10 +164,26 @@ async function renderProjects(){
   }
 }
 
-/* ===== 项目详情：提交记录 ===== */
+/* ===== 项目详情：按选择人分组 + 自动版本管理 ===== */
 let CUR_P=null;
+function choiceRows(p,ch){
+  let rows='';
+  ch.forEach(c=>{
+    if(c.type==='pick'){
+      rows+='<div class="srow">'+(c.file?'<img src="'+purl(p,c.file)+'">':'')+
+        '<div class="t">'+esc(c.group_zh)+' → <b>'+esc(c.name||'')+'</b><span class="vi">'+esc(c.group_vi||'')+'</span></div></div>';
+    }else{
+      rows+='<div class="srow">'+(c.file?'<img src="'+purl(p,c.file)+'">':'')+
+        '<div class="t">'+(c.agree?'<span class="v-ok">✓ 同意</span> ':'<span class="v-no">✗ 不同意</span> ')+esc(c.group_zh)+
+        '<span class="vi">'+esc(c.group_vi||'')+'</span>'+
+        (!c.agree&&c.reason?'<span class="rsn">理由：'+esc(c.reason)+'</span>':'')+'</div></div>';
+    }
+  });
+  return rows;
+}
 async function renderDetail(p){
   CUR_P=p;
+  $('pjList').style.display='none';
   const d=$('detail'); d.innerHTML='';
   const subs=window['_subs_'+p.id]||await fetchSubs(p.id);
   // 加载该项目 manifest 供 PDF 用
@@ -162,37 +192,51 @@ async function renderDetail(p){
     window['_mf_'+p.id]={P:pj,M:mf};
   }
   const t=document.createElement('div');
-  t.innerHTML='<div class="secT">'+esc(p.zh)+' · 提交记录（'+subs.length+'）</div>';
+  t.innerHTML='<a class="back" id="btnBack">← 返回项目列表</a>'+
+    '<div class="secT">'+esc(p.zh)+' · 共 '+subs.length+' 次提交</div>';
   d.appendChild(t);
+  t.querySelector('#btnBack').onclick=()=>{$('detail').innerHTML='';$('pjList').style.display='';renderProjects();window.scrollTo(0,0);};
   if(!subs.length){
     const e=document.createElement('div');e.className='sub2';e.textContent='还没有人提交。';d.appendChild(e);
+    return;
   }
-  subs.forEach((s,idx)=>{
-    const div=document.createElement('div'); div.className='sub2';
-    const time=fmtTime(new Date(s.created_at));
-    const ch=(s.data&&s.data.choices)||[];
-    let rows='';
-    ch.forEach(c=>{
-      if(c.type==='pick'){
-        rows+='<div class="srow">'+(c.file?'<img src="'+purl(p,c.file)+'">':'')+
-          '<div class="t">'+esc(c.group_zh)+' → <b>'+esc(c.name||'')+'</b><span class="vi">'+esc(c.group_vi||'')+'</span></div></div>';
-      }else{
-        rows+='<div class="srow">'+(c.file?'<img src="'+purl(p,c.file)+'">':'')+
-          '<div class="t">'+(c.agree?'<span class="v-ok">✓ 同意</span> ':'<span class="v-no">✗ 不同意</span> ')+esc(c.group_zh)+
-          '<span class="vi">'+esc(c.group_vi||'')+'</span>'+
-          (!c.agree&&c.reason?'<span class="rsn">理由：'+esc(c.reason)+'</span>':'')+'</div></div>';
+  // 按选择人分组，组内按时间升序编号版本 v1、v2…（最早的=v1，最新=最大号）
+  const bySel={};
+  subs.forEach(s=>{(bySel[s.selector]=bySel[s.selector]||[]).push(s);});
+  Object.values(bySel).forEach(arr=>arr.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)));
+  const sels=Object.keys(bySel).sort((a,b)=>new Date(bySel[b][bySel[b].length-1].created_at)-new Date(bySel[a][bySel[a].length-1].created_at));
+  sels.forEach(sel=>{
+    const arr=bySel[sel];           // 升序：arr[0]=v1 … arr[last]=最新版
+    const latestIdx=arr.length-1;
+    const div=document.createElement('div'); div.className='selcard';
+    const latest=arr[latestIdx];
+    div.innerHTML='<div class="hd"><span class="who">'+esc(sel)+'<span class="ver-tag">v'+(latestIdx+1)+' 最新</span></span>'+
+      '<span class="vcount">共 '+arr.length+' 个版本</span></div>'+
+      '<div class="time2">最新提交：'+fmtTime(new Date(latest.created_at))+'</div>'+
+      '<div class="items">'+choiceRows(p,(latest.data&&latest.data.choices)||[])+'</div>'+
+      '<div class="acts"><button class="primary pdf">下载最新版 PDF (v'+(latestIdx+1)+')</button><button class="del">删除此版本</button></div>';
+    div.querySelector('.pdf').onclick=()=>exportPDF(p,latest,latestIdx+1);
+    div.querySelector('.del').onclick=()=>delSub(p,latest);
+    // 历史版本
+    if(arr.length>1){
+      const tg=document.createElement('button'); tg.className='verToggle';
+      tg.textContent='查看历史版本（v1 – v'+latestIdx+'，共 '+latestIdx+' 个）▾';
+      const vl=document.createElement('div'); vl.className='verlist'; vl.style.display='none';
+      for(let i=latestIdx-1;i>=0;i--){
+        const s=arr[i], v=i+1;
+        const row=document.createElement('div'); row.className='verrow';
+        row.innerHTML='<span class="ver-tag old">v'+v+'</span><span class="vt">'+fmtTime(new Date(s.created_at))+'</span>'+
+          '<button class="vpdf">PDF</button><button class="vdel">删除</button>';
+        row.querySelector('.vpdf').onclick=()=>exportPDF(p,s,v);
+        row.querySelector('.vdel').onclick=()=>delSub(p,s);
+        vl.appendChild(row);
       }
-    });
-    div.innerHTML='<div class="hd"><span class="who">'+esc(s.selector)+'</span>'+(idx===0?'<span class="chip ok" style="font-size:11px">最新</span>':'')+'</div>'+
-      '<div class="time2">提交时间：'+time+'</div>'+
-      '<div class="items">'+rows+'</div>'+
-      '<div class="acts"><button class="primary pdf">下载此结果 PDF</button><button class="del">删除此记录</button></div>';
-    div.querySelector('.pdf').onclick=()=>exportPDF(p,s);
-    div.querySelector('.del').onclick=()=>delSub(p,s,div);
+      tg.onclick=()=>{const open=vl.style.display!=='none';vl.style.display=open?'none':'block';tg.textContent=(open?'查看历史版本（v1 – v'+latestIdx+'，共 '+latestIdx+' 个）▾':'收起历史版本 ▴');};
+      div.appendChild(tg); div.appendChild(vl);
+    }
     d.appendChild(div);
   });
   window.scrollTo(0,0);
-  $('detail').scrollIntoView();
 }
 
 /* 时间：精确到秒 + 相对提示 */
@@ -204,7 +248,7 @@ function fmtTime(t){
   return abs+'（'+rel+'）';
 }
 /* 删除单条提交 */
-async function delSub(p,s,div){
+async function delSub(p,s){
   if(!confirm('确定删除这条提交记录？\n'+s.selector+' · '+fmtTime(new Date(s.created_at))+'\n删除后不可恢复。'))return;
   try{
     const r=await fetch(CONFIG.SUPABASE_URL+'/rest/v1/submissions?id=eq.'+s.id,{
@@ -214,9 +258,7 @@ async function delSub(p,s,div){
     if(!r.ok)throw new Error('HTTP '+r.status);
     const arr=window['_subs_'+p.id]||[];
     window['_subs_'+p.id]=arr.filter(x=>x.id!==s.id);
-    div.remove();
     toast('已删除');
-    renderProjects();
     renderDetail(p);
   }catch(e){toast('删除失败：'+e.message);}
 }
@@ -241,7 +283,7 @@ function drawImgFit(x,img,bx,by,bw,bh){
   const w=img.width*r,h=img.height*r;
   x.drawImage(img,bx+(bw-w)/2,by+(bh-h)/2,w,h);
 }
-async function exportPDF(p,s){
+async function exportPDF(p,s,ver){
   const {P,M}=window['_mf_'+p.id];
   const ch=(s.data&&s.data.choices)||[];
   if(!ch.length){toast('这条提交没有内容');return;}
@@ -260,7 +302,7 @@ async function exportPDF(p,s){
     y=drawText(x,P.title_vi,y+10,PW-140,'34px sans-serif','#555',50);
     y+=40;
     y=drawText(x,'选择人 / Người chọn：'+s.selector,y,PW-140,'bold 38px sans-serif','#8a5a00',56);
-    y=drawText(x,'提交时间 / Thời gian：'+time.toLocaleString('zh-CN',{hour12:false}),y+6,PW-140,'30px sans-serif','#333',44);
+    y=drawText(x,'提交时间 / Thời gian：'+time.toLocaleString('zh-CN',{hour12:false})+(ver?'　版本 / Phiên bản：v'+ver:''),y+6,PW-140,'30px sans-serif','#333',44);
     y=drawText(x,'共选择 / Tổng：'+ch.length+' 项 / mục',y+6,PW-140,'30px sans-serif','#333',44);
     addPage(c);
     // 每项一页
@@ -302,7 +344,7 @@ async function exportPDF(p,s){
     }
     $('pct').textContent='100%';
     const whoZh=(s.data&&s.data.who_zh)||s.selector.split(' / ')[0];
-    const fname=(P.export_prefix||'选择结果')+'_'+whoZh.replace(/\s/g,'')+'_'+dstr+'.pdf';
+    const fname=(P.export_prefix||'选择结果')+'_'+whoZh.replace(/\s/g,'')+(ver?'_v'+ver:'')+'_'+dstr+'.pdf';
     const blob=pdf.output('blob');
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;
     document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),4000);
